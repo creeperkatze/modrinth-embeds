@@ -4,11 +4,15 @@ import path from "path";
 const LOG_DIRECTORY = process.env.LOG_DIRECTORY || "./logs";
 const isVercel = process.env.VERCEL === '1';
 
-const consoleFormat = format.combine(
-  format.colorize(),
-  format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-  format.printf(({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`)
-);
+const consoleFormat = isVercel
+  ? format.combine(
+      format.printf(({ message }) => message)
+    )
+  : format.combine(
+      format.colorize(),
+      format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+      format.printf(({ timestamp, level, message }) => `${timestamp} [${level}]: ${message}`)
+    );
 
 const fileFormat = format.combine(
   format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
