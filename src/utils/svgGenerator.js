@@ -21,11 +21,11 @@ export function generateUserSummaryCard(data, theme = 'dark') {
   const { user, stats } = data;
   const isDark = theme === 'dark';
 
-  const bgColor = isDark ? '#1e1e2e' : '#ffffff';
-  const textColor = isDark ? '#cdd6f4' : '#1e1e2e';
-  const accentColor = isDark ? '#89fa8f' : '#42f51e';
-  const secondaryTextColor = isDark ? '#a6adc8' : '#4c4f69';
-  const borderColor = isDark ? '#313244' : '#dce0e8';
+  const bgColor = 'transparent';
+  const textColor = isDark ? '#c9d1d9' : '#1e1e2e';
+  const accentColor = isDark ? '#1bd96a' : '#1bd96a';
+  const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
+  const borderColor = isDark ? '#30363d' : '#dce0e8';
 
   const username = escapeXml(user.username);
   const totalDownloads = formatNumber(stats.totalDownloads);
@@ -36,16 +36,8 @@ export function generateUserSummaryCard(data, theme = 'dark') {
 
   return `
 <svg width="450" height="220" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:${accentColor};stop-opacity:0.15" />
-      <stop offset="100%" style="stop-color:${accentColor};stop-opacity:0" />
-    </linearGradient>
-  </defs>
-
   <!-- Background -->
-  <rect width="450" height="220" fill="${bgColor}" rx="10" stroke="${borderColor}" stroke-width="1"/>
-  <rect width="450" height="120" fill="url(#grad)"/>
+  <rect width="450" height="220" fill="${bgColor}" rx="6" stroke="${borderColor}" stroke-width="1"/>
 
   <!-- Title -->
   <text x="20" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${textColor}">
@@ -103,12 +95,12 @@ export function generateTopProjectsCard(data, theme = 'dark') {
   const { user, stats } = data;
   const isDark = theme === 'dark';
 
-  const bgColor = isDark ? '#1e1e2e' : '#ffffff';
-  const textColor = isDark ? '#cdd6f4' : '#1e1e2e';
-  const accentColor = isDark ? '#89fa8f' : '#42f51e';
-  const secondaryTextColor = isDark ? '#a6adc8' : '#4c4f69';
-  const borderColor = isDark ? '#313244' : '#dce0e8';
-  const barBgColor = isDark ? '#313244' : '#e6e9ef';
+  const bgColor = 'transparent';
+  const textColor = isDark ? '#c9d1d9' : '#1e1e2e';
+  const accentColor = isDark ? '#1bd96a' : '#1bd96a';
+  const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
+  const borderColor = isDark ? '#30363d' : '#dce0e8';
+  const barBgColor = isDark ? '#21262d' : '#e6e9ef';
 
   const username = escapeXml(user.username);
   const topProjects = stats.topProjects.slice(0, 5);
@@ -141,16 +133,8 @@ export function generateTopProjectsCard(data, theme = 'dark') {
 
   return `
 <svg width="450" height="${height}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:${accentColor};stop-opacity:0.15" />
-      <stop offset="100%" style="stop-color:${accentColor};stop-opacity:0" />
-    </linearGradient>
-  </defs>
-
   <!-- Background -->
-  <rect width="450" height="${height}" fill="${bgColor}" rx="10" stroke="${borderColor}" stroke-width="1"/>
-  <rect width="450" height="120" fill="url(#grad)"/>
+  <rect width="450" height="${height}" fill="${bgColor}" rx="6" stroke="${borderColor}" stroke-width="1"/>
 
   <!-- Title -->
   <text x="20" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${textColor}">
@@ -161,7 +145,7 @@ export function generateTopProjectsCard(data, theme = 'dark') {
 </svg>`.trim();
 }
 
-export function generateBadge(label, value, color = '#89b4fa') {
+export function generateBadge(label, value, color = '#1bd96a') {
   const labelWidth = label.length * 7 + 20;
   const valueWidth = value.length * 8 + 20;
   const totalWidth = labelWidth + valueWidth;
