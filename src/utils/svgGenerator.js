@@ -132,6 +132,9 @@ export function generateUserCard(data, theme = 'dark')
     const hasProjects = topProjects.length > 0;
     const height = hasProjects ? 150 + (topProjects.length * 50) : 110;
 
+    // Calculate max downloads for relative bar sizing
+    const maxDownloads = hasProjects ? Math.max(...topProjects.map(p => p.downloads)) : 0;
+
     // Generate top projects list
     let projectsHtml = '';
     topProjects.forEach((project, index) => {
@@ -139,6 +142,9 @@ export function generateUserCard(data, theme = 'dark')
         const projectName = escapeXml(project.title.length > 20 ? project.title.substring(0, 17) + '...' : project.title);
         const downloads = formatNumber(project.downloads);
         const followers = formatNumber(project.followers || 0);
+
+        // Calculate relative bar width (max 420px width - 10px padding on each side)
+        const barWidth = (project.downloads / maxDownloads) * 400;
 
         // Get loaders for this project
         const loaders = project.loaders || [];
@@ -158,7 +164,15 @@ export function generateUserCard(data, theme = 'dark')
         projectsHtml += `
   <!-- Project ${index + 1} -->
   <g>
+    <defs>
+      <clipPath id="project-clip-${index}">
+        <rect x="15" y="${yPos - 18}" width="420" height="40" rx="6"/>
+      </clipPath>
+    </defs>
     <rect x="15" y="${yPos - 18}" width="420" height="40" fill="none" stroke="${borderColor}" stroke-width="1" rx="6" vector-effect="non-scaling-stroke"/>
+
+    <!-- Relative downloads bar -->
+    <rect x="15" y="${yPos - 18}" width="${barWidth}" height="4" fill="${accentColor}" clip-path="url(#project-clip-${index})"/>
 
     <text x="20" y="${yPos - 2}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="13" font-weight="600" fill="${textColor}">
       ${projectName}
