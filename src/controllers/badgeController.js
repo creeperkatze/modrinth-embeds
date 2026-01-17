@@ -2,88 +2,40 @@ import modrinthClient from '../services/modrinthClient.js';
 import cache from '../utils/cache.js';
 import { generateBadge, formatNumber } from '../utils/svgGenerator.js';
 
-export const getDownloads = async (req, res, next) => {
+const MAX_AGE = Math.floor(cache.ttl / 1000);
+
+const handleBadgeRequest = async (req, res, next, badgeType, getValue) => {
   try {
     const { username } = req.params;
-    const color = req.query.color || '#1d8b1d';
+    const color = req.query.color || '#1bd96a';
+    const cacheKey = `badge:${badgeType}:${username}`;
 
-    // Check cache first
-    const cacheKey = `badge:downloads:${username}`;
     const cached = cache.get(cacheKey);
-
     if (cached) {
       res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'public, max-age=600');
+      res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
       return res.send(cached);
     }
 
-    // Fetch data from Modrinth
     const data = await modrinthClient.getUserStats(username);
+    const value = getValue(data.stats);
+    const svg = generateBadge(badgeType, value, color);
 
-    // Generate badge
-    const svg = generateBadge('downloads', formatNumber(data.stats.totalDownloads), color);
-
-    // Cache the result
     cache.set(cacheKey, svg);
 
     res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=600');
+    res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
     res.send(svg);
   } catch (err) {
     next(err);
   }
 };
 
-export const getProjects = async (req, res, next) => {
-  try {
-    const { username } = req.params;
-    const color = req.query.color || '#89b4fa';
+export const getDownloads = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'downloads', stats => formatNumber(stats.totalDownloads));
 
-    const cacheKey = `badge:projects:${username}`;
-    const cached = cache.get(cacheKey);
+export const getProjects = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'projects', stats => stats.projectCount.toString());
 
-    if (cached) {
-      res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'public, max-age=600');
-      return res.send(cached);
-    }
-
-    const data = await modrinthClient.getUserStats(username);
-    const svg = generateBadge('projects', data.stats.projectCount.toString(), color);
-
-    cache.set(cacheKey, svg);
-
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=600');
-    res.send(svg);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const getFollowers = async (req, res, next) => {
-  try {
-    const { username } = req.params;
-    const color = req.query.color || '#89b4fa';
-
-    const cacheKey = `badge:followers:${username}`;
-    const cached = cache.get(cacheKey);
-
-    if (cached) {
-      res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'public, max-age=600');
-      return res.send(cached);
-    }
-
-    const data = await modrinthClient.getUserStats(username);
-    const svg = generateBadge('followers', formatNumber(data.stats.totalFollowers), color);
-
-    cache.set(cacheKey, svg);
-
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=600');
-    res.send(svg);
-  } catch (err) {
-    next(err);
-  }
-};
+export const getFollowers = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'followers', stats => formatNumber(stats.totalFollowers));

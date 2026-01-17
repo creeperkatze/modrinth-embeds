@@ -1,67 +1,37 @@
 import modrinthClient from '../services/modrinthClient.js';
 import cache from '../utils/cache.js';
-import { generateUserSummaryCard, generateProjectsCard as generateProjectsCard } from '../utils/svgGenerator.js';
+import { generateUserSummaryCard, generateProjectsCard } from '../utils/svgGenerator.js';
 
-export const getSummary = async (req, res, next) => {
+const MAX_AGE = Math.floor(cache.ttl / 1000);
+
+const handleCardRequest = async (req, res, next, cardType, generator) => {
   try {
     const { username } = req.params;
     const theme = req.query.theme || 'dark';
+    const cacheKey = `${cardType}:${username}:${theme}`;
 
-    // Check cache first
-    const cacheKey = `summary:${username}:${theme}`;
     const cached = cache.get(cacheKey);
-
     if (cached) {
       res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'public, max-age=600'); // 10 minutes
+      res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
       return res.send(cached);
     }
 
-    // Fetch data from Modrinth
     const data = await modrinthClient.getUserStats(username);
+    const svg = generator(data, theme);
 
-    // Generate SVG
-    const svg = generateUserSummaryCard(data, theme);
-
-    // Cache the result
     cache.set(cacheKey, svg);
 
     res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=600'); // 10 minutes
+    res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
     res.send(svg);
   } catch (err) {
     next(err);
   }
 };
 
-export const getProjects = async (req, res, next) => {
-  try {
-    const { username } = req.params;
-    const theme = req.query.theme || 'dark';
+export const getSummary = (req, res, next) =>
+  handleCardRequest(req, res, next, 'summary', generateUserSummaryCard);
 
-    // Check cache first
-    const cacheKey = `projects:${username}:${theme}`;
-    const cached = cache.get(cacheKey);
-
-    if (cached) {
-      res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'public, max-age=600');
-      return res.send(cached);
-    }
-
-    // Fetch data from Modrinth
-    const data = await modrinthClient.getUserStats(username);
-
-    // Generate SVG
-    const svg = generateProjectsCard(data, theme);
-
-    // Cache the result
-    cache.set(cacheKey, svg);
-
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=600');
-    res.send(svg);
-  } catch (err) {
-    next(err);
-  }
-};
+export const getProjects = (req, res, next) =>
+  handleCardRequest(req, res, next, 'projects', generateProjectsCard);
