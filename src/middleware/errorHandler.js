@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import { generateBadge } from '../utils/svgGenerator.js';
 
 function generateErrorCard(message, theme = 'dark') {
@@ -19,7 +20,7 @@ function generateErrorCard(message, theme = 'dark') {
 }
 
 export function errorHandler(err, req, res, next) {
-  console.error('Error:', err.message);
+  logger.error('Error:', err.message);
 
   const theme = req.query.theme || 'dark';
 
