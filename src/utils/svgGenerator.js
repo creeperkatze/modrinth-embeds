@@ -25,7 +25,7 @@ export function generateUserSummaryCard(data, theme = 'dark') {
   const textColor = isDark ? '#c9d1d9' : '#1e1e2e';
   const accentColor = isDark ? '#1bd96a' : '#1bd96a';
   const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
-  const borderColor = isDark ? '#30363d' : '#dce0e8';
+  const borderColor = '#E4E2E2';
 
   const username = escapeXml(user.username);
   const totalDownloads = formatNumber(stats.totalDownloads);
@@ -36,8 +36,13 @@ export function generateUserSummaryCard(data, theme = 'dark') {
 
   return `
 <svg width="450" height="220" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect width="450" height="220" fill="${bgColor}" rx="6" stroke="${borderColor}" stroke-width="1"/>
+  <defs>
+    <clipPath id="outer_rectangle_summary">
+      <rect width="450" height="220" rx="4.5"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#outer_rectangle_summary)">
+    <rect stroke="${borderColor}" fill="${bgColor}" rx="4.5" x="0.5" y="0.5" width="449" height="219"/>
 
   <!-- Title -->
   <text x="20" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${textColor}">
@@ -88,6 +93,7 @@ export function generateUserSummaryCard(data, theme = 'dark') {
   <text x="430" y="190" text-anchor="end" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" fill="${accentColor}">
     ${topProjectDownloads} downloads
   </text>
+  </g>
 </svg>`.trim();
 }
 
@@ -99,7 +105,7 @@ export function generateTopProjectsCard(data, theme = 'dark') {
   const textColor = isDark ? '#c9d1d9' : '#1e1e2e';
   const accentColor = isDark ? '#1bd96a' : '#1bd96a';
   const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
-  const borderColor = isDark ? '#30363d' : '#dce0e8';
+  const borderColor = '#E4E2E2';
   const barBgColor = isDark ? '#21262d' : '#e6e9ef';
 
   const username = escapeXml(user.username);
@@ -133,8 +139,13 @@ export function generateTopProjectsCard(data, theme = 'dark') {
 
   return `
 <svg width="450" height="${height}" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect width="450" height="${height}" fill="${bgColor}" rx="6" stroke="${borderColor}" stroke-width="1"/>
+  <defs>
+    <clipPath id="outer_rectangle_projects">
+      <rect width="450" height="${height}" rx="4.5"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#outer_rectangle_projects)">
+    <rect stroke="${borderColor}" fill="${bgColor}" rx="4.5" x="0.5" y="0.5" width="449" height="${height - 1}"/>
 
   <!-- Title -->
   <text x="20" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${textColor}">
@@ -142,6 +153,7 @@ export function generateTopProjectsCard(data, theme = 'dark') {
   </text>
 
   ${projectsHtml}
+  </g>
 </svg>`.trim();
 }
 
