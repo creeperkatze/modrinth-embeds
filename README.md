@@ -3,5 +3,6 @@
 > [!NOTE]
 > In developement
 
-## Example
-<img align=top src="https://modrinth-readme-stats.creeperkatze.de/card/user/prospector" />
+## Examples
+<img src="https://modrinth-readme-stats.creeperkatze.de/user/prospector" />
+<img src="https://modrinth-readme-stats.creeperkatze.de/project/modmenu" />
