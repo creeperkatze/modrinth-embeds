@@ -2,7 +2,7 @@
 
 Generate beautiful, embeddable cards and badges for Modrinth projects, users, organizations, and collections.
 
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/2d89t.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/2d89t.svg)](https://status.creeperkatze.de)
 ![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modrinth-embeds?labelColor=0d143c)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modrinth-embeds?labelColor=0d143c)
 ![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modrinth-embeds?style=flat&labelColor=0d143c)
