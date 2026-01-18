@@ -1,17 +1,17 @@
-import { formatNumber, escapeXml, truncateText } from '../utils/formatters.js';
-import { ICONS } from '../constants/icons.js';
-import { getLoaderColor, getProjectTypeIcon } from '../constants/loaderConfig.js';
+import { formatNumber, escapeXml, truncateText } from "../utils/formatters.js";
+import { ICONS } from "../constants/icons.js";
+import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js";
 
-export function generateCollectionCard(data, theme = 'dark')
+export function generateCollectionCard(data, theme = "dark")
 {
     const { collection, stats } = data;
-    const isDark = theme === 'dark';
+    const isDark = theme === "dark";
 
-    const bgColor = 'transparent';
-    const textColor = isDark ? '#c9d1d9' : '#1e1e2e';
-    const accentColor = isDark ? '#1bd96a' : '#1bd96a';
-    const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
-    const borderColor = '#E4E2E2';
+    const bgColor = "transparent";
+    const textColor = isDark ? "#c9d1d9" : "#1e1e2e";
+    const accentColor = isDark ? "#1bd96a" : "#1bd96a";
+    const secondaryTextColor = isDark ? "#8b949e" : "#4c4f69";
+    const borderColor = "#E4E2E2";
 
     const name = escapeXml(truncateText(collection.name, 22));
     const totalDownloads = formatNumber(stats.totalDownloads);
@@ -26,7 +26,7 @@ export function generateCollectionCard(data, theme = 'dark')
     const maxDownloads = hasProjects ? Math.max(...topProjects.map(p => p.downloads)) : 0;
 
     // Generate top projects list
-    let projectsHtml = '';
+    let projectsHtml = "";
     topProjects.forEach((project, index) => {
         const yPos = 160 + (index * 50);
         const projectName = escapeXml(truncateText(project.title, 18));
@@ -42,7 +42,7 @@ export function generateCollectionCard(data, theme = 'dark')
 
         // Get loaders for this project
         const loaders = project.loaders || [];
-        let loaderIconsHtml = '';
+        let loaderIconsHtml = "";
         loaders.forEach((loader, loaderIndex) => {
             const loaderName = loader.toLowerCase();
             const iconFunc = ICONS[loaderName];
@@ -55,7 +55,7 @@ export function generateCollectionCard(data, theme = 'dark')
             }
         });
 
-        const projectIconUrl = project.icon_url_base64 || project.icon_url || '';
+        const projectIconUrl = project.icon_url_base64 || project.icon_url || "";
 
         projectsHtml += `
   <!-- Project ${index + 1} -->
@@ -183,7 +183,7 @@ export function generateCollectionCard(data, theme = 'dark')
     Projects
   </text>
 
-  ${projectsHtml}` : ''}
+  ${projectsHtml}` : ""}
 
   <!-- Bottom right attribution -->
   <text x="445" y="${height - 5}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="${secondaryTextColor}" text-anchor="end" opacity="0.6">

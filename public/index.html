@@ -147,7 +147,9 @@
             </div>
 
             <div id="preview" class="preview">
-                <img id="previewImg" src="" alt="Preview" />
+                <a id="previewLink" href="" target="_blank">
+                    <img id="previewImg" src="" alt="Preview" />
+                </a>
                 <div class="markdown-output" id="markdownOutput"></div>
                 <button class="copy-btn" onclick="copyUrl()">Copy</button>
             </div>
@@ -161,6 +163,7 @@
             const identifier = document.getElementById("identifier");
             const inputLabel = document.getElementById("inputLabel");
             const preview = document.getElementById("preview");
+            const previewLink = document.getElementById("previewLink");
             const previewImg = document.getElementById("previewImg");
             const markdownOutput = document.getElementById("markdownOutput");
 
@@ -220,8 +223,11 @@
                     url = `${window.location.origin}/${type}/${identifierValue}/${metric}`;
                 }
 
+                const modrinthUrl = `https://modrinth.com/${type}/${identifierValue}`;
+
                 // Show preview immediately with placeholder markdown
-                markdownOutput.textContent = `[![${identifierValue}](${url})](https://modrinth.com/${type}/${identifierValue})`;
+                markdownOutput.textContent = `[![${identifierValue}](${url})](${modrinthUrl})`;
+                previewLink.href = modrinthUrl;
                 preview.classList.add("active");
 
                 // Load the image first
@@ -239,7 +245,7 @@
                     } catch (_) {
                         // ignore and fallback to identifier
                     }
-                    markdownOutput.textContent = `[![${displayName}](${url})](https://modrinth.com/${type}/${identifierValue})`;
+                    markdownOutput.textContent = `[![${displayName}](${url})](${modrinthUrl})`;
                 };
             }
 

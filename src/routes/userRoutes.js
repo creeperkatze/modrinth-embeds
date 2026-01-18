@@ -1,16 +1,15 @@
-import express from 'express';
-import * as cardController from '../controllers/cardController.js';
-import * as badgeController from '../controllers/badgeController.js';
+import express from "express";
+import * as cardController from "../controllers/cardController.js";
+import * as badgeController from "../controllers/badgeController.js";
 
 const router = express.Router();
 
-router.get('/user/:username', cardController.getUser);
-router.get('/card/summary/:username', cardController.getUser); // Deprecated
-router.get('/card/user/:username', cardController.getUser); // Deprecated
+router.get("/user/:username", cardController.getUser);
+router.get("/card/summary/:username", cardController.getUser); // Deprecated
+router.get("/card/user/:username", cardController.getUser); // Deprecated
 
-router.get('/user/:username/downloads', badgeController.getUserDownloads);
-router.get('/user/:username/projects', badgeController.getUserProjects);
-router.get('/user/:username/followers', badgeController.getUserFollowers);
+router.get("/user/:username/downloads", badgeController.getUserDownloads);
+router.get("/user/:username/projects", badgeController.getUserProjects);
+router.get("/user/:username/followers", badgeController.getUserFollowers);
 
 export default router;
-    

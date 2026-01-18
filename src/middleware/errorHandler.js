@@ -1,13 +1,20 @@
-import { generateBadge } from '../generators/badge.js';
+import { generateBadge } from "../generators/badge.js";
 
-function generateErrorCard(message, theme = 'dark') {
-  const isDark = theme === 'dark';
-  const bgColor = 'transparent';
-  const errorTextColor = '#f38ba8';
-  const accentColor = '#1bd96a';
-  const borderColor = '#E4E2E2';
+function generateErrorCard(message, detailText = "")
+{
+    const bgColor = "transparent";
+    const errorTextColor = "#f38ba8";
+    const detailTextColor = "#a6adc8";
+    const accentColor = "#1bd96a";
+    const borderColor = "#E4E2E2";
 
-  return `
+    // Truncate detail text if too long
+    const maxDetailLength = 60;
+    const truncatedDetail = detailText.length > maxDetailLength
+        ? detailText.substring(0, maxDetailLength) + "..."
+        : detailText;
+
+    return `
 <svg width="450" height="120" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <clipPath id="error_rectangle">
@@ -24,47 +31,80 @@ function generateErrorCard(message, theme = 'dark') {
     </svg>
 
     <!-- Error Text -->
-    <text x="225" y="65" text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="16" font-weight="600" fill="${errorTextColor}">
+    <text x="225" y="${detailText ? "55" : "65"}" text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="16" font-weight="600" fill="${errorTextColor}">
       ${message}
     </text>
+    ${detailText ? `<text x="225" y="75" text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="12" fill="${detailTextColor}">
+      ${truncatedDetail}
+    </text>` : ""}
   </g>
 </svg>`.trim();
 }
 
-export function errorHandler(err, req, res, next) {
-  const theme = req.query.theme || 'dark';
+// Map status codes to user-friendly messages
+function getStatusMessage(statusCode)
+{
+    const statusMessages = {
+        400: "Bad Request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Not Found",
+        429: "Rate Limit Exceeded",
+        500: "Internal Server Error",
+        502: "API Unavailable",
+        503: "Service Unavailable",
+        504: "Gateway Timeout"
+    };
+    return statusMessages[statusCode] || `Error ${statusCode}`;
+}
 
-  let statusCode = 500;
-  let message = 'Internal Server Error';
+export function errorHandler(err, req, res)
+{
+    const theme = req.query.theme || "dark";
 
-  if (err.message.includes('not found')) {
-    statusCode = 404;
-    // Determine if this is a project, user, organization, or collection request
-    const isProjectRequest = req.path.includes('/project/');
-    const isOrganizationRequest = req.path.includes('/organization/');
-    const isCollectionRequest = req.path.includes('/collection/');
-    message = isProjectRequest ? 'Project not found' :
-              isOrganizationRequest ? 'Organization not found' :
-              isCollectionRequest ? 'Collection not found' :
-              'User not found';
-  } else if (err.message.includes('Modrinth API')) {
-    statusCode = 502;
-    message = 'Modrinth API unavailable';
-  } else if (err.message.includes('Rate limit')) {
-    statusCode = 429;
-    message = 'Rate limit exceeded';
-  }
+    let statusCode = 500;
+    let message = "Internal Server Error";
+    let detailText = "";
 
-  // Check if this is a badge request
-  const isBadge = req.path.includes('/badge');
+    if (err.message.includes("not found"))
+    {
+        statusCode = 404;
+        // Determine if this is a project, user, organization, or collection request
+        const isProjectRequest = req.path.includes("/project/");
+        const isOrganizationRequest = req.path.includes("/organization/");
+        const isCollectionRequest = req.path.includes("/collection/");
+        message = isProjectRequest ? "Project not found" :
+            isOrganizationRequest ? "Organization not found" :
+                isCollectionRequest ? "Collection not found" :
+                    "User not found";
+    } else if (err.message.includes("Modrinth API"))
+    {
+        // Extract status code and error text from error message (format: "Modrinth API error: STATUS|TEXT")
+        const errorMatch = err.message.match(/Modrinth API error: (\d+)\|?(.*)/);
+        const apiStatusCode = errorMatch ? parseInt(errorMatch[1]) : 502;
+        const apiErrorText = errorMatch && errorMatch[2] ? errorMatch[2].trim() : "";
 
-  // Return appropriate error SVG
-  res.setHeader('Content-Type', 'image/svg+xml');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        statusCode = apiStatusCode;
+        message = getStatusMessage(apiStatusCode);
+        detailText = apiErrorText;
+    } else if (err.message.includes("Rate limit"))
+    {
+        statusCode = 429;
+        message = "Rate limit exceeded";
+    }
 
-  if (isBadge) {
-    res.status(statusCode).send(generateBadge('error', message, '#f38ba8'));
-  } else {
-    res.status(statusCode).send(generateErrorCard(message, theme));
-  }
+    // Check if this is a badge request
+    const isBadge = req.path.includes("/badge");
+
+    // Return appropriate error SVG
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+
+    if (isBadge)
+    {
+        res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
+    } else
+    {
+        res.status(statusCode).send(generateErrorCard(message, theme, detailText));
+    }
 }

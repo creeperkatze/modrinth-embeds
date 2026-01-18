@@ -1,7 +1,7 @@
-import { escapeXml } from '../utils/formatters.js';
-import { ICONS } from '../constants/icons.js';
+import { escapeXml } from "../utils/formatters.js";
+import { ICONS } from "../constants/icons.js";
 
-export function generateBadge(label, value, color = '#1bd96a')
+export function generateBadge(label, value, color = "#1bd96a")
 {
     const iconWidth = 30;
     const labelWidth = label.length * 7 + 20;
@@ -9,10 +9,10 @@ export function generateBadge(label, value, color = '#1bd96a')
     const totalWidth = iconWidth + labelWidth + valueWidth;
     const height = 30;
 
-    const bgColor = 'transparent';
-    const labelTextColor = '#8b949e';
-    const valueTextColor = '#1bd96a';
-    const borderColor = '#E4E2E2';
+    const bgColor = "transparent";
+    const labelTextColor = "#8b949e";
+    const valueTextColor = "#1bd96a";
+    const borderColor = "#E4E2E2";
 
     return `
 <svg width="${totalWidth}" height="${height}" xmlns="http://www.w3.org/2000/svg">

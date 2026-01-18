@@ -1,17 +1,17 @@
-import { formatNumber, escapeXml, truncateText } from '../utils/formatters.js';
-import { ICONS } from '../constants/icons.js';
-import { getLoaderColor, getProjectTypeIcon } from '../constants/loaderConfig.js';
+import { formatNumber, escapeXml, truncateText } from "../utils/formatters.js";
+import { ICONS } from "../constants/icons.js";
+import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js";
 
-export function generateProjectCard(data, theme = 'dark')
+export function generateProjectCard(data, theme = "dark")
 {
     const { project, versions, stats } = data;
-    const isDark = theme === 'dark';
+    const isDark = theme === "dark";
 
-    const bgColor = 'transparent';
-    const textColor = isDark ? '#c9d1d9' : '#1e1e2e';
-    const accentColor = isDark ? '#1bd96a' : '#1bd96a';
-    const secondaryTextColor = isDark ? '#8b949e' : '#4c4f69';
-    const borderColor = '#E4E2E2';
+    const bgColor = "transparent";
+    const textColor = isDark ? "#c9d1d9" : "#1e1e2e";
+    const accentColor = isDark ? "#1bd96a" : "#1bd96a";
+    const secondaryTextColor = isDark ? "#8b949e" : "#4c4f69";
+    const borderColor = "#E4E2E2";
 
     const projectName = escapeXml(truncateText(project.title, 22));
     const downloads = formatNumber(stats.downloads);
@@ -27,23 +27,22 @@ export function generateProjectCard(data, theme = 'dark')
     const height = hasVersions ? 150 + (latestVersions.length * 50) : 110;
 
     // Generate latest versions list
-    let versionsHtml = '';
+    let versionsHtml = "";
     latestVersions.forEach((version, index) => {
         const yPos = 160 + (index * 50);
-        const versionName = escapeXml(version.name);
         const versionNumber = escapeXml(truncateText(version.version_number, 18));
 
         // Format date
         const publishedDate = new Date(version.date_published);
-        const dateStr = publishedDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
+        const dateStr = publishedDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
         });
 
         // Get loaders for this version
         const loaders = version.loaders || [];
-        let loaderIconsHtml = '';
+        let loaderIconsHtml = "";
         loaders.forEach((loader, loaderIndex) => {
             const loaderName = loader.toLowerCase();
             const iconFunc = ICONS[loaderName];
@@ -58,7 +57,7 @@ export function generateProjectCard(data, theme = 'dark')
 
         // Get game versions (show first 3)
         const gameVersions = version.game_versions || [];
-        const gameVersionsText = gameVersions.slice(0, 3).join(', ') + (gameVersions.length > 3 ? '...' : '');
+        const gameVersionsText = gameVersions.slice(0, 3).join(", ") + (gameVersions.length > 3 ? "..." : "");
 
         // Calculate position for game versions (after loaders with padding)
         const gameVersionsX = 20 + (loaders.length * 18) + 2; // 2px padding after loaders
@@ -183,7 +182,7 @@ export function generateProjectCard(data, theme = 'dark')
     Latest Versions
   </text>
 
-  ${versionsHtml}` : ''}
+  ${versionsHtml}` : ""}
 
   <!-- Bottom right attribution -->
   <text x="445" y="${height - 5}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="${secondaryTextColor}" text-anchor="end" opacity="0.6">
