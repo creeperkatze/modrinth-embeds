@@ -17,7 +17,6 @@ export function generateUserCard(data, theme = 'dark')
     const totalDownloads = formatNumber(stats.totalDownloads);
     const projectCount = stats.projectCount;
     const totalFollowers = formatNumber(stats.totalFollowers);
-    const avgDownloads = formatNumber(stats.avgDownloads);
 
     const topProjects = stats.topProjects.slice(0, 5);
     const hasProjects = topProjects.length > 0;
@@ -181,7 +180,7 @@ export function generateUserCard(data, theme = 'dark')
   <line x1="15" y1="110" x2="435" y2="110" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
 
   <!-- Top Projects Header -->
-  <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${secondaryTextColor}">
+  <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${textColor}">
     Top Projects
   </text>
 

@@ -89,19 +89,19 @@ export function generateProjectCard(data, theme = 'dark')
     </text>
 
     <!-- Date -->
-    <text x="410" y="${yPos}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${secondaryTextColor}" text-anchor="end">
+    <text x="410" y="${yPos}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${textColor}" text-anchor="end">
       ${dateStr}
     </text>
     <svg x="415" y="${yPos - 12}" width="14" height="14" viewBox="0 0 24 24">
-      ${ICONS.calendar(secondaryTextColor)}
+      ${ICONS.calendar(textColor)}
     </svg>
 
     <!-- Downloads (below date) -->
-    <text x="410" y="${yPos + 18}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${secondaryTextColor}" text-anchor="end">
+    <text x="410" y="${yPos + 18}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" fill="${textColor}" text-anchor="end">
       ${versionDownloads}
     </text>
     <svg x="415" y="${yPos + 6}" width="14" height="14" viewBox="0 0 24 24">
-      ${ICONS.download(secondaryTextColor)}
+      ${ICONS.download(textColor)}
     </svg>
   </g>`;
     });
@@ -180,7 +180,7 @@ export function generateProjectCard(data, theme = 'dark')
   <line x1="15" y1="110" x2="435" y2="110" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
 
   <!-- Latest Versions Header -->
-  <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${secondaryTextColor}">
+  <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${textColor}">
     Latest Versions
   </text>
 
