@@ -12,16 +12,28 @@
             }
             body {
                 font-family: "Segoe UI", Ubuntu, sans-serif;
-                background: #1e1e2e;
+                background: #000;
                 color: #c9d1d9;
                 min-height: 100vh;
                 padding: 40px 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
-            .container {
-                max-width: 600px;
-                margin: 0 auto;
+            .card {
+                background: #1e1e2e;
+                border-radius: 12px;
+                padding: 40px;
+                max-width: 1200px;
+                width: 100%;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             }
-            h1 {
+            .card-content {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+            .left-panel h1 {
                 color: #1bd96a;
                 margin-bottom: 8px;
                 font-size: 32px;
@@ -29,7 +41,7 @@
             }
             .subtitle {
                 color: #8b949e;
-                margin-bottom: 40px;
+                margin-bottom: 32px;
                 font-size: 14px;
             }
             .section {
@@ -52,7 +64,7 @@
                 width: 100%;
                 padding: 10px 12px;
                 background: #2a2a3a;
-                border: 1px solid #e4e2e2;
+                border: 1px solid #3a3a4a;
                 border-radius: 4px;
                 color: #c9d1d9;
                 font-size: 14px;
@@ -63,28 +75,50 @@
                 outline: none;
                 border-color: #1bd96a;
             }
-            .preview {
-                margin-top: 32px;
-                display: none;
+            .right-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
             }
-            .preview.active {
-                display: block;
+            .right-panel h2 {
+                color: #c9d1d9;
+                font-size: 18px;
+                font-weight: 600;
+                margin-bottom: 8px;
             }
-            .preview img {
+            .preview-container {
+                background: #2a2a3a;
+                border: 1px solid #3a3a4a;
+                border-radius: 8px;
+                padding: 24px;
+                min-height: 400px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .preview-container.empty {
+                color: #8b949e;
+                font-size: 14px;
+            }
+            .preview-container img {
                 max-width: 100%;
                 display: block;
-                margin-bottom: 12px;
             }
             .markdown-output {
                 padding: 12px;
                 background: #2a2a3a;
-                border: 1px solid #e4e2e2;
+                border: 1px solid #3a3a4a;
                 border-radius: 4px;
                 font-family: monospace;
                 font-size: 12px;
                 word-break: break-all;
                 color: #c9d1d9;
-                margin-bottom: 8px;
+                min-height: 60px;
+                display: flex;
+                align-items: center;
+            }
+            .markdown-output.empty {
+                color: #8b949e;
             }
             button {
                 padding: 10px 16px;
@@ -95,63 +129,91 @@
                 font-size: 14px;
                 font-weight: 600;
                 cursor: pointer;
+                transition: background 0.2s;
             }
             button:hover {
                 background: #19c25e;
             }
+            button:disabled {
+                background: #3a3a4a;
+                color: #8b949e;
+                cursor: not-allowed;
+            }
+            @media (max-width: 768px) {
+                .card-content {
+                    grid-template-columns: 1fr;
+                }
+            }
         </style>
     </head>
     <body>
-        <div class="container">
-            <h1>Modrinth Embeds</h1>
-            <p class="subtitle">Generate embeddable SVG cards and badges for Modrinth projects, users, organizations, and collections</p>
+        <div class="card">
+            <div class="card-content">
+                <div class="left-panel">
+                    <h1>Modrinth Embeds</h1>
+                    <p class="subtitle">Generate embeddable SVG cards and badges for Modrinth projects, users, organizations, and collections</p>
 
-            <div class="section">
-                <h2>Type</h2>
-                <div class="input-group">
-                    <select id="embedType">
-                        <option value="card">Card</option>
-                        <option value="badge">Badge</option>
-                    </select>
+                    <div class="section">
+                        <h2>Type</h2>
+                        <div class="input-group">
+                            <select id="embedType">
+                                <option value="card">Card</option>
+                                <option value="badge">Badge</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>Target</h2>
+                        <div class="input-group">
+                            <select id="targetType">
+                                <option value="user">User</option>
+                                <option value="project">Project</option>
+                                <option value="organization">Organization</option>
+                                <option value="collection">Collection</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="section" id="badgeSection" style="display: none">
+                        <h2>Badge Metric</h2>
+                        <div class="input-group">
+                            <select id="badgeMetric">
+                                <option value="downloads">Downloads</option>
+                                <option value="followers">Followers</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2>Details</h2>
+                        <div class="input-group">
+                            <label id="inputLabel">Username</label>
+                            <input type="text" id="identifier" placeholder="Enter username or project slug" />
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="section">
-                <h2>Target</h2>
-                <div class="input-group">
-                    <select id="targetType">
-                        <option value="user">User</option>
-                        <option value="project">Project</option>
-                        <option value="organization">Organization</option>
-                        <option value="collection">Collection</option>
-                    </select>
+                <div class="right-panel">
+                    <div>
+                        <h2>Preview</h2>
+                        <div class="preview-container empty" id="previewContainer">
+                            <span id="previewPlaceholder">Your embed will appear here</span>
+                            <a id="previewLink" href="" target="_blank" style="display: none">
+                                <img id="previewImg" src="" alt="Preview" />
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2>Markdown</h2>
+                        <div class="markdown-output empty" id="markdownOutput">
+                            <span id="markdownPlaceholder">Your markdown code will appear here</span>
+                        </div>
+                    </div>
+
+                    <button class="copy-btn" onclick="copyUrl()" id="copyBtn" disabled>Copy</button>
                 </div>
-            </div>
-
-            <div class="section" id="badgeSection" style="display: none">
-                <h2>Badge Metric</h2>
-                <div class="input-group">
-                    <select id="badgeMetric">
-                        <option value="downloads">Downloads</option>
-                        <option value="followers">Followers</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Details</h2>
-                <div class="input-group">
-                    <label id="inputLabel">Username</label>
-                    <input type="text" id="identifier" placeholder="Enter username or project slug" />
-                </div>
-            </div>
-
-            <div id="preview" class="preview">
-                <a id="previewLink" href="" target="_blank">
-                    <img id="previewImg" src="" alt="Preview" />
-                </a>
-                <div class="markdown-output" id="markdownOutput"></div>
-                <button class="copy-btn" onclick="copyUrl()">Copy</button>
             </div>
         </div>
 
@@ -162,10 +224,13 @@
             const badgeMetric = document.getElementById("badgeMetric");
             const identifier = document.getElementById("identifier");
             const inputLabel = document.getElementById("inputLabel");
-            const preview = document.getElementById("preview");
+            const previewContainer = document.getElementById("previewContainer");
+            const previewPlaceholder = document.getElementById("previewPlaceholder");
             const previewLink = document.getElementById("previewLink");
             const previewImg = document.getElementById("previewImg");
             const markdownOutput = document.getElementById("markdownOutput");
+            const markdownPlaceholder = document.getElementById("markdownPlaceholder");
+            const copyBtn = document.getElementById("copyBtn");
 
             function updateBadgeOptions() {
                 const target = targetType.value;
@@ -211,7 +276,14 @@
                 const identifierValue = identifier.value.trim();
 
                 if (!identifierValue) {
-                    preview.classList.remove("active");
+                    // Reset to empty state
+                    previewContainer.classList.add("empty");
+                    previewPlaceholder.style.display = "inline";
+                    previewLink.style.display = "none";
+                    markdownOutput.classList.add("empty");
+                    markdownPlaceholder.style.display = "inline";
+                    markdownOutput.innerHTML = '<span id="markdownPlaceholder">Your markdown code will appear here</span>';
+                    copyBtn.disabled = true;
                     return;
                 }
 
@@ -226,9 +298,14 @@
                 const modrinthUrl = `https://modrinth.com/${type}/${identifierValue}`;
 
                 // Show preview immediately with placeholder markdown
+                markdownOutput.classList.remove("empty");
                 markdownOutput.textContent = `[![${identifierValue}](${url})](${modrinthUrl})`;
+
                 previewLink.href = modrinthUrl;
-                preview.classList.add("active");
+                previewContainer.classList.remove("empty");
+                previewPlaceholder.style.display = "none";
+                previewLink.style.display = "block";
+                copyBtn.disabled = false;
 
                 // Load the image first
                 previewImg.src = url + "?t=" + Date.now();
@@ -255,12 +332,14 @@
             identifier.addEventListener("input", generate);
 
             function copyUrl() {
-                navigator.clipboard.writeText(markdownOutput.textContent).then(() => {
-                    const btn = event.target;
-                    const originalText = btn.textContent;
-                    btn.textContent = "Copied!";
+                const text = markdownOutput.textContent.trim();
+                if (!text || text === "Your markdown code will appear here") return;
+
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = "Copied!";
                     setTimeout(() => {
-                        btn.textContent = originalText;
+                        copyBtn.textContent = originalText;
                     }, 2000);
                 });
             }
