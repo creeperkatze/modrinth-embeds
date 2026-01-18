@@ -140,10 +140,10 @@ export function generateUserCard(data, theme = 'dark')
   <!-- Profile Picture (upper right) -->
   <defs>
     <clipPath id="profile-clip">
-      <circle cx="395" cy="60" r="40"/>
+      <circle cx="400" cy="60" r="35"/>
     </clipPath>
   </defs>
-  ${user.avatar_url_base64 || user.avatar_url ? `<image x="355" y="20" width="80" height="80" href="${user.avatar_url_base64 || user.avatar_url}" clip-path="url(#profile-clip)"/>` : `<circle cx="405" cy="60" r="40" fill="${borderColor}"/>`}
+  ${user.avatar_url_base64 || user.avatar_url ? `<image x="365" y="25" width="70" height="70" href="${user.avatar_url_base64 || user.avatar_url}" clip-path="url(#profile-clip)"/>` : `<circle cx="400" cy="60" r="35" fill="${borderColor}"/>`}
 
   <!-- Stats Grid Row 1 -->
   <!-- Total Downloads -->

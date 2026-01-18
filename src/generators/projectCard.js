@@ -140,10 +140,10 @@ export function generateProjectCard(data, theme = 'dark')
   <!-- Project Image (upper right) -->
   <defs>
     <clipPath id="project-image-clip">
-      <rect x="355" y="20" width="80" height="80" rx="16"/>
+      <rect x="365" y="25" width="70" height="70" rx="14"/>
     </clipPath>
   </defs>
-  ${project.icon_url_base64 || project.icon_url ? `<image x="355" y="20" width="80" height="80" href="${project.icon_url_base64 || project.icon_url}" clip-path="url(#project-image-clip)"/>` : `<rect x="355" y="20" width="80" height="80" rx="16" fill="${borderColor}"/>`}
+  ${project.icon_url_base64 || project.icon_url ? `<image x="365" y="25" width="70" height="70" href="${project.icon_url_base64 || project.icon_url}" clip-path="url(#project-image-clip)"/>` : `<rect x="365" y="25" width="70" height="70" rx="14" fill="${borderColor}"/>`}
 
   <!-- Stats Grid Row 1 -->
   <!-- Total Downloads -->
