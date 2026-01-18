@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="0.50835204"
-     inkscape:cx="129.83129"
-     inkscape:cy="447.52451"
+     inkscape:zoom="1.0167041"
+     inkscape:cx="90.488473"
+     inkscape:cy="235.5651"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -39,20 +39,20 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.344746;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.35776;stroke-linejoin:round;stroke-opacity:1"
        id="rect1"
-       width="65"
+       width="70"
        height="15"
        x="5"
-       y="15"
+       y="12.5"
        ry="7.5" />
     <rect
        style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.165611;stroke-linejoin:round;stroke-opacity:1"
        id="rect1-8"
        width="15"
        height="15"
-       x="78.908936"
-       y="15"
+       x="80"
+       y="12.5"
        ry="7.5" />
     <rect
        style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.405661;stroke-linejoin:round;stroke-opacity:1"
@@ -60,7 +60,7 @@
        width="90"
        height="15"
        x="5"
-       y="70"
+       y="72.5"
        ry="7.5" />
     <rect
        style="fill:#1bd96a;fill-opacity:1;stroke:none;stroke-width:0.405661;stroke-linejoin:round;stroke-opacity:1"
