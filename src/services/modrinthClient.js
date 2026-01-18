@@ -119,9 +119,13 @@ export class ModrinthClient
             {
                 try {
                     const versions = await this.getProjectVersions(project.id || project.slug);
-                    allVersions.push(...versions.map(v => v.date_published));
+                    const versionDates = versions.map(v => v.date_published);
+                    allVersions.push(...versionDates);
+                    // Store version dates on the project itself for individual sparklines
+                    project.versionDates = versionDates;
                 } catch (error) {
                     // Silently ignore version fetch errors for individual projects
+                    project.versionDates = [];
                 }
             })
         );
@@ -286,9 +290,13 @@ export class ModrinthClient
             {
                 try {
                     const versions = await this.getProjectVersions(project.id || project.slug);
-                    allVersions.push(...versions.map(v => v.date_published));
+                    const versionDates = versions.map(v => v.date_published);
+                    allVersions.push(...versionDates);
+                    // Store version dates on the project itself for individual sparklines
+                    project.versionDates = versionDates;
                 } catch (error) {
                     // Silently ignore version fetch errors for individual projects
+                    project.versionDates = [];
                 }
             })
         );
@@ -428,6 +436,24 @@ export class ModrinthClient
             ? await this.getProjects(collection.projects)
             : [];
 
+        // Fetch all versions for all projects to get version dates
+        const allVersions = [];
+        await Promise.all(
+            projects.map(async (project) =>
+            {
+                try {
+                    const versions = await this.getProjectVersions(project.id || project.slug);
+                    const versionDates = versions.map(v => v.date_published);
+                    allVersions.push(...versionDates);
+                    // Store version dates on the project itself for individual sparklines
+                    project.versionDates = versionDates;
+                } catch (error) {
+                    // Silently ignore version fetch errors for individual projects
+                    project.versionDates = [];
+                }
+            })
+        );
+
         // Fetch collection icon as base64
         if (collection.icon_url)
         {
@@ -462,7 +488,8 @@ export class ModrinthClient
                 totalDownloads,
                 totalFollowers,
                 projectCount,
-                topProjects
+                topProjects,
+                allVersionDates: allVersions
             }
         };
     }

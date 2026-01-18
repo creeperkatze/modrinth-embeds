@@ -1,4 +1,4 @@
-import { formatNumber, escapeXml, truncateText } from "../utils/formatters.js";
+import { formatNumber, escapeXml, truncateText, generateSparkline } from "../utils/formatters.js";
 import { ICONS } from "../constants/icons.js";
 import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js";
 
@@ -24,6 +24,10 @@ export function generateCollectionCard(data, theme = "dark")
     // Calculate max downloads for relative bar sizing
     const maxDownloads = hasProjects ? Math.max(...topProjects.map(p => p.downloads)) : 0;
 
+    // Generate activity sparkline from all version dates across all projects
+    const allVersionDates = stats.allVersionDates || [];
+    const { path: sparklinePath, fillPath: sparklineFillPath } = generateSparkline(allVersionDates);
+
     // Generate top projects list
     let projectsHtml = "";
     topProjects.forEach((project, index) => {
@@ -34,6 +38,12 @@ export function generateCollectionCard(data, theme = "dark")
 
         // Calculate relative bar width (max 420px width - 10px padding on each side)
         const barWidth = (project.downloads / maxDownloads) * 400;
+
+        // Generate sparkline for this project's version history (60% width, 3/4 height of 40px card = 30px)
+        const projectVersionDates = project.versionDates || [];
+        const sparklineWidth = 420 * 0.6; // 60% of card width
+        const sparklineHeight = 40 * 0.75; // 3/4 of card height
+        const { path: projectSparklinePath, fillPath: projectSparklineFillPath } = generateSparkline(projectVersionDates, sparklineWidth, sparklineHeight);
 
         // Get project type icon
         const projectTypeIconName = getProjectTypeIcon(project.project_type);
@@ -68,6 +78,24 @@ export function generateCollectionCard(data, theme = "dark")
       </clipPath>
     </defs>
     <rect x="15" y="${yPos - 18}" width="420" height="40" fill="none" stroke="${borderColor}" stroke-width="1" rx="6" vector-effect="non-scaling-stroke"/>
+
+    <!-- Project version activity sparkline (centered, 60% width) -->
+    <g transform="translate(${15 + (420 * 0.2)}, ${yPos - 88})">
+      <path
+        d="${projectSparklinePath}"
+        fill="none"
+        stroke="${accentColor}"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.3"
+      />
+      <path
+        d="${projectSparklineFillPath}"
+        fill="${accentColor}"
+        opacity="0.05"
+      />
+    </g>
 
     <!-- Relative downloads bar -->
     <rect x="15" y="${yPos - 18}" width="${barWidth}" height="3" fill="${accentColor}" clip-path="url(#project-clip-${index})"/>
@@ -114,6 +142,24 @@ export function generateCollectionCard(data, theme = "dark")
   </defs>
   <g clip-path="url(#outer_rectangle_summary)">
     <rect stroke="${borderColor}" fill="${bgColor}" rx="4.5" x="0.5" y="0.5" width="449" height="${height - 1}" vector-effect="non-scaling-stroke"/>
+
+  <!-- Activity Sparkline (background) -->
+  <g transform="translate(15, 0)">
+    <path
+      d="${sparklinePath}"
+      fill="none"
+      stroke="${accentColor}"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="0.3"
+    />
+    <path
+      d="${sparklineFillPath}"
+      fill="${accentColor}"
+      opacity="0.05"
+    />
+  </g>
 
   <!-- Modrinth Icon -->
   <svg x="15" y="15" width="24" height="24" viewBox="0 0 512 514">

@@ -39,6 +39,12 @@ export function generateUserCard(data, theme = "dark")
         // Calculate relative bar width (max 420px width - 10px padding on each side)
         const barWidth = (project.downloads / maxDownloads) * 400;
 
+        // Generate sparkline for this project's version history (60% width, 3/4 height of 40px card = 30px)
+        const projectVersionDates = project.versionDates || [];
+        const sparklineWidth = 420 * 0.6; // 60% of card width
+        const sparklineHeight = 40 * 0.75; // 3/4 of card height
+        const { path: projectSparklinePath, fillPath: projectSparklineFillPath } = generateSparkline(projectVersionDates, sparklineWidth, sparklineHeight);
+
         // Get project type icon
         const projectTypeIconName = getProjectTypeIcon(project.project_type);
         const projectTypeIcon = ICONS[projectTypeIconName];
@@ -72,6 +78,24 @@ export function generateUserCard(data, theme = "dark")
       </clipPath>
     </defs>
     <rect x="15" y="${yPos - 18}" width="420" height="40" fill="none" stroke="${borderColor}" stroke-width="1" rx="6" vector-effect="non-scaling-stroke"/>
+
+    <!-- Project version activity sparkline (centered, 60% width) -->
+    <g transform="translate(${15 + (420 * 0.2)}, ${yPos - 88})">
+      <path
+        d="${projectSparklinePath}"
+        fill="none"
+        stroke="${accentColor}"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.3"
+      />
+      <path
+        d="${projectSparklineFillPath}"
+        fill="${accentColor}"
+        opacity="0.05"
+      />
+    </g>
 
     <!-- Relative downloads bar -->
     <rect x="15" y="${yPos - 18}" width="${barWidth}" height="3" fill="${accentColor}" clip-path="url(#project-clip-${index})"/>
