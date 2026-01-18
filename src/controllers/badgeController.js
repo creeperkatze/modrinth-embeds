@@ -6,41 +6,52 @@ import logger from '../utils/logger.js';
 
 const MAX_AGE = Math.floor(cache.ttl / 1000);
 
-const handleBadgeRequest = async (req, res, next, badgeType, getValue) => {
+const handleBadgeRequest = async (req, res, next, badgeType, getValue, getDataFunc) => {
   try {
-    const { username } = req.params;
+    const identifier = req.params.username || req.params.slug;
     const color = req.query.color || '#1bd96a';
-    const cacheKey = `badge:${badgeType}:${username}`;
+    const cacheKey = `badge:${badgeType}:${identifier}`;
 
     const cached = cache.get(cacheKey);
     if (cached) {
-      logger.info(`Showing ${badgeType} badge for "${username}" (cached)`);
+      logger.info(`Showing ${badgeType} badge for "${identifier}" (cached)`);
       res.setHeader('Content-Type', 'image/svg+xml');
       res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
       return res.send(cached);
     }
 
-    const data = await modrinthClient.getUserStats(username);
+    const data = await getDataFunc(identifier);
     const value = getValue(data.stats);
     const svg = generateBadge(badgeType, value, color);
 
     cache.set(cacheKey, svg);
-    logger.info(`Showing ${badgeType} badge for "${username}"`);
+    logger.info(`Showing ${badgeType} badge for "${identifier}"`);
 
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
     res.send(svg);
   } catch (err) {
-    logger.error(`Error showing ${badgeType} badge for "${req.params.username}": ${err.message}`);
+    logger.error(`Error showing ${badgeType} badge for "${req.params.username || req.params.slug}": ${err.message}`);
     next(err);
   }
 };
 
-export const getDownloads = (req, res, next) =>
-  handleBadgeRequest(req, res, next, 'downloads', stats => formatNumber(stats.totalDownloads));
+// User badges
+export const getUserDownloads = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Downloads', stats => formatNumber(stats.totalDownloads), modrinthClient.getUserStats.bind(modrinthClient));
 
-export const getProjects = (req, res, next) =>
-  handleBadgeRequest(req, res, next, 'projects', stats => stats.projectCount.toString());
+export const getUserProjects = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Projects', stats => stats.projectCount.toString(), modrinthClient.getUserStats.bind(modrinthClient));
 
-export const getFollowers = (req, res, next) =>
-  handleBadgeRequest(req, res, next, 'followers', stats => formatNumber(stats.totalFollowers));
+export const getUserFollowers = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Followers', stats => formatNumber(stats.totalFollowers), modrinthClient.getUserStats.bind(modrinthClient));
+
+// Project badges
+export const getProjectDownloads = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Downloads', stats => formatNumber(stats.downloads), modrinthClient.getProjectStats.bind(modrinthClient));
+
+export const getProjectFollowers = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Followers', stats => formatNumber(stats.followers), modrinthClient.getProjectStats.bind(modrinthClient));
+
+export const getProjectVersions = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Versions', stats => stats.versionCount.toString(), modrinthClient.getProjectStats.bind(modrinthClient));

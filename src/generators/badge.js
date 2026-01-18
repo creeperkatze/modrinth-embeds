@@ -5,7 +5,7 @@ export function generateBadge(label, value, color = '#1bd96a')
     const labelWidth = label.length * 7 + 20;
     const valueWidth = value.length * 8 + 20;
     const totalWidth = labelWidth + valueWidth;
-    const height = 20;
+    const height = 30;
 
     const bgColor = 'transparent';
     const labelTextColor = '#8b949e';
@@ -25,9 +25,9 @@ export function generateBadge(label, value, color = '#1bd96a')
     <line x1="${labelWidth}" y1="1" x2="${labelWidth}" y2="${height - 1}" stroke="${borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
   </g>
 
-  <g text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="11" font-weight="500">
-    <text x="${labelWidth / 2}" y="14.5" fill="${labelTextColor}">${escapeXml(label)}</text>
-    <text x="${labelWidth + (valueWidth / 2)}" y="14.5" fill="${valueTextColor}">${escapeXml(value)}</text>
+  <g text-anchor="middle" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="500">
+    <text x="${labelWidth / 2}" y="20" fill="${labelTextColor}">${escapeXml(label)}</text>
+    <text x="${labelWidth + (valueWidth / 2)}" y="20" fill="${valueTextColor}">${escapeXml(value)}</text>
   </g>
 </svg>`.trim();
 }
