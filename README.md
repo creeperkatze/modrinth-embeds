@@ -167,7 +167,7 @@ GET /collection/{id}/followers
 ```
 Returns a badge showing follower count.
 
-## Self-Hosting
+## Deployment
 
 ### Prerequisites
 
@@ -194,6 +194,10 @@ pnpm start
 ### Environment Variables
 
 Copy the `.env.example` file and rename it to `.env`
+
+## Contributing
+
+Contributions are always welcome. Just open a pull request!
 
 ## License
 
