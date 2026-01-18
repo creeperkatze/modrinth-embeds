@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import logger from "./utils/logger.js";
 import userRoutes from './routes/userRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
+import organizationRoutes from './routes/organizationRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config({ quiet: true });
@@ -10,12 +11,9 @@ dotenv.config({ quiet: true });
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use('/', userRoutes, projectRoutes);
+app.use(express.static('public'));
 
-app.get('/', (req, res) =>
-{
-    res.redirect(301, 'https://github.com/creeperkatze/modrinth-embeds');
-});
+app.use('/', userRoutes, projectRoutes, organizationRoutes);
 
 app.use(errorHandler);
 

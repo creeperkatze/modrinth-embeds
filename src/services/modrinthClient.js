@@ -3,7 +3,8 @@ import logger from '../utils/logger.js';
 
 dotenv.config({ quiet: true });
 
-const MODRINTH_API = process.env.MODRINTH_URL;
+const MODRINTH_API_URL = process.env.MODRINTH_API_URL;
+const MODRINTH_API_V3_URL = process.env.MODRINTH_API_V3_URL;
 const USER_AGENT = process.env.USER_AGENT;
 
 export class ModrinthClient {
@@ -27,19 +28,27 @@ export class ModrinthClient {
   }
 
   async getUser(username) {
-    return this.fetch(`${MODRINTH_API}/user/${username}`);
+    return this.fetch(`${MODRINTH_API_URL}/user/${username}`);
   }
 
   async getUserProjects(username) {
-    return this.fetch(`${MODRINTH_API}/user/${username}/projects`);
+    return this.fetch(`${MODRINTH_API_URL}/user/${username}/projects`);
   }
 
   async getProject(slug) {
-    return this.fetch(`${MODRINTH_API}/project/${slug}`);
+    return this.fetch(`${MODRINTH_API_URL}/project/${slug}`);
   }
 
   async getProjectVersions(slug) {
-    return this.fetch(`${MODRINTH_API}/project/${slug}/version`);
+    return this.fetch(`${MODRINTH_API_URL}/project/${slug}/version`);
+  }
+
+  async getOrganization(id) {
+    return this.fetch(`${MODRINTH_API_V3_URL}/organization/${id}`);
+  }
+
+  async getOrganizationProjects(id) {
+    return this.fetch(`${MODRINTH_API_V3_URL}/organization/${id}/projects`);
   }
 
   async fetchImageAsBase64(url) {
@@ -195,6 +204,123 @@ export class ModrinthClient {
         downloads: project.downloads || 0,
         followers: project.followers || 0,
         versionCount: versions.length
+      }
+    };
+  }
+
+  async getOrganizationStats(id) {
+    const [organization, projects] = await Promise.all([
+      this.getOrganization(id),
+      this.getOrganizationProjects(id)
+    ]);
+
+    // Fetch organization icon as base64
+    if (organization.icon_url) {
+      organization.icon_url_base64 = await this.fetchImageAsBase64(organization.icon_url);
+    }
+
+    // Fetch project icons as base64
+    await Promise.all(
+      projects.map(async (project) => {
+        if (project.icon_url) {
+          project.icon_url_base64 = await this.fetchImageAsBase64(project.icon_url);
+        }
+      })
+    );
+
+    // Calculate aggregate statistics
+    const totalDownloads = projects.reduce((sum, project) => sum + (project.downloads || 0), 0);
+    const totalFollowers = projects.reduce((sum, project) => sum + (project.followers || 0), 0);
+    const projectCount = projects.length;
+
+    // Find most popular project
+    const mostPopular = projects.reduce((max, project) =>
+      (project.downloads || 0) > (max.downloads || 0) ? project : max
+    , projects[0] || null);
+
+    // Sort projects by downloads for top projects
+    // Map v3 API fields to match what the card generator expects
+    const topProjects = [...projects]
+      .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+      .slice(0, 5)
+      .map(project => ({
+        ...project,
+        title: project.name, // v3 uses 'name', cards expect 'title'
+        project_type: project.project_types?.[0] || 'mod' // v3 uses array, cards expect string
+      }));
+
+    // Calculate new metrics
+    const avgDownloads = projectCount > 0 ? Math.floor(totalDownloads / projectCount) : 0;
+    const engagementRatio = totalDownloads > 0 ? (totalFollowers / totalDownloads * 1000).toFixed(1) : 0;
+
+    // Project type breakdown
+    const projectTypes = projects.reduce((acc, project) => {
+      const types = project.project_types || ['mod'];
+      types.forEach(type => {
+        acc[type] = (acc[type] || 0) + 1;
+      });
+      return acc;
+    }, {});
+
+    // Game versions (get most common versions)
+    const gameVersions = {};
+    projects.forEach(project => {
+      if (project.game_versions && Array.isArray(project.game_versions)) {
+        project.game_versions.forEach(version => {
+          gameVersions[version] = (gameVersions[version] || 0) + 1;
+        });
+      }
+    });
+    const topGameVersions = Object.entries(gameVersions)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([version]) => version);
+
+    // Loaders breakdown
+    const loaders = {};
+    projects.forEach(project => {
+      if (project.loaders && Array.isArray(project.loaders)) {
+        project.loaders.forEach(loader => {
+          loaders[loader] = (loaders[loader] || 0) + 1;
+        });
+      }
+    });
+
+    // Categories (most common)
+    const categories = {};
+    projects.forEach(project => {
+      if (project.categories && Array.isArray(project.categories)) {
+        project.categories.forEach(category => {
+          categories[category] = (categories[category] || 0) + 1;
+        });
+      }
+    });
+    const topCategories = Object.entries(categories)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category]) => category);
+
+    // Recent activity
+    const recentProject = projects
+      .filter(p => p.published)
+      .sort((a, b) => new Date(b.published) - new Date(a.published))[0];
+
+    return {
+      organization,
+      projects,
+      stats: {
+        totalDownloads,
+        totalFollowers,
+        projectCount,
+        mostPopular,
+        topProjects,
+        avgDownloads,
+        engagementRatio,
+        projectTypes,
+        topGameVersions,
+        loaders,
+        topCategories,
+        recentProject
       }
     };
   }

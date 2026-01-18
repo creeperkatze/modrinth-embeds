@@ -8,7 +8,7 @@ const MAX_AGE = Math.floor(cache.ttl / 1000);
 
 const handleBadgeRequest = async (req, res, next, badgeType, getValue, getDataFunc) => {
   try {
-    const identifier = req.params.username || req.params.slug;
+    const identifier = req.params.username || req.params.slug || req.params.id;
     const color = req.query.color || '#1bd96a';
     const cacheKey = `badge:${badgeType}:${identifier}`;
 
@@ -31,7 +31,7 @@ const handleBadgeRequest = async (req, res, next, badgeType, getValue, getDataFu
     res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
     res.send(svg);
   } catch (err) {
-    logger.error(`Error showing ${badgeType} badge for "${req.params.username || req.params.slug}": ${err.message}`);
+    logger.error(`Error showing ${badgeType} badge for "${req.params.username || req.params.slug || req.params.id}": ${err.message}`);
     next(err);
   }
 };
@@ -55,3 +55,13 @@ export const getProjectFollowers = (req, res, next) =>
 
 export const getProjectVersions = (req, res, next) =>
   handleBadgeRequest(req, res, next, 'Versions', stats => stats.versionCount.toString(), modrinthClient.getProjectStats.bind(modrinthClient));
+
+// Organization badges
+export const getOrganizationDownloads = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Downloads', stats => formatNumber(stats.totalDownloads), modrinthClient.getOrganizationStats.bind(modrinthClient));
+
+export const getOrganizationProjects = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Projects', stats => stats.projectCount.toString(), modrinthClient.getOrganizationStats.bind(modrinthClient));
+
+export const getOrganizationFollowers = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Followers', stats => formatNumber(stats.totalFollowers), modrinthClient.getOrganizationStats.bind(modrinthClient));
