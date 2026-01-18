@@ -203,26 +203,35 @@
                 generate();
             }
 
-            function generate() {
+            async function generate() {
                 const type = targetType.value;
-                const id = identifier.value.trim();
+                const identifierValue = identifier.value.trim();
 
-                if (!id) {
+                if (!identifierValue) {
                     preview.classList.remove("active");
                     return;
                 }
 
                 let url;
                 if (embedType.value === "card") {
-                    url = `${window.location.origin}/${type}/${id}`;
+                    url = `${window.location.origin}/${type}/${identifierValue}`;
                 } else {
                     const metric = badgeMetric.value;
-                    url = `${window.location.origin}/${type}/${id}/${metric}`;
+                    url = `${window.location.origin}/${type}/${identifierValue}/${metric}`;
                 }
 
                 previewImg.src = url + "?t=" + Date.now();
-                const name = id;
-                markdownOutput.textContent = `[![${name}](${url})](https://modrinth.com/${type}/${id})`;
+                let displayName = identifierValue;
+                try {
+                    const res = await fetch(`/meta/${type}/${encodeURIComponent(identifierValue)}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.name) displayName = data.name;
+                    }
+                } catch (_) {
+                    // ignore and fallback to identifier
+                }
+                markdownOutput.textContent = `[![${displayName}](${url})](https://modrinth.com/${type}/${identifierValue})`;
                 preview.classList.add("active");
             }
 
