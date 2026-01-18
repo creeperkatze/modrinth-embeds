@@ -5,8 +5,8 @@ import * as badgeController from "../controllers/badgeController.js";
 const router = express.Router();
 
 router.get("/user/:username", cardController.getUser);
-router.get("/card/summary/:username", cardController.getUser); // Deprecated
-router.get("/card/user/:username", cardController.getUser); // Deprecated
+router.get("/card/summary/:username", (req, res) => res.redirect("/")); // Deprecated
+router.get("/card/user/:username", (req, res) => res.redirect("/")); // Deprecated
 
 router.get("/user/:username/downloads", badgeController.getUserDownloads);
 router.get("/user/:username/projects", badgeController.getUserProjects);
