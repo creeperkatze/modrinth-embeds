@@ -1,241 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modrinth Embeds</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Ubuntu, sans-serif;
-            background: #1e1e2e;
-            color: #c9d1d9;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #1bd96a;
-            margin-bottom: 8px;
-            font-size: 32px;
-            font-weight: bold;
-        }
-        .subtitle {
-            color: #8b949e;
-            margin-bottom: 40px;
-            font-size: 14px;
-        }
-        .section {
-            margin-bottom: 24px;
-        }
-        .section h2 {
-            color: #c9d1d9;
-            font-size: 14px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        label {
-            display: block;
-            color: #8b949e;
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            background: #2a2a3a;
-            border: 1px solid #E4E2E2;
-            border-radius: 4px;
-            color: #c9d1d9;
-            font-size: 14px;
-            font-family: inherit;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #1bd96a;
-        }
-        .preview {
-            margin-top: 32px;
-            display: none;
-        }
-        .preview.active {
-            display: block;
-        }
-        .preview img {
-            max-width: 100%;
-            display: block;
-            margin-bottom: 12px;
-        }
-        .url-output {
-            padding: 12px;
-            background: #2a2a3a;
-            border: 1px solid #E4E2E2;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
-            color: #c9d1d9;
-            margin-bottom: 8px;
-        }
-        button {
-            padding: 10px 16px;
-            background: #1bd96a;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #19c25e;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Modrinth Embeds</h1>
-        <p class="subtitle">Generate embeddable SVG cards and badges for Modrinth projects, users, and organizations</p>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Modrinth Embeds</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: "Segoe UI", Ubuntu, sans-serif;
+                background: #1e1e2e;
+                color: #c9d1d9;
+                min-height: 100vh;
+                padding: 40px 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            h1 {
+                color: #1bd96a;
+                margin-bottom: 8px;
+                font-size: 32px;
+                font-weight: bold;
+            }
+            .subtitle {
+                color: #8b949e;
+                margin-bottom: 40px;
+                font-size: 14px;
+            }
+            .section {
+                margin-bottom: 24px;
+            }
+            .section h2 {
+                color: #c9d1d9;
+                font-size: 14px;
+                margin-bottom: 8px;
+                font-weight: 600;
+            }
+            label {
+                display: block;
+                color: #8b949e;
+                margin-bottom: 6px;
+                font-size: 13px;
+            }
+            input,
+            select {
+                width: 100%;
+                padding: 10px 12px;
+                background: #2a2a3a;
+                border: 1px solid #e4e2e2;
+                border-radius: 4px;
+                color: #c9d1d9;
+                font-size: 14px;
+                font-family: inherit;
+            }
+            input:focus,
+            select:focus {
+                outline: none;
+                border-color: #1bd96a;
+            }
+            .preview {
+                margin-top: 32px;
+                display: none;
+            }
+            .preview.active {
+                display: block;
+            }
+            .preview img {
+                max-width: 100%;
+                display: block;
+                margin-bottom: 12px;
+            }
+            .url-output {
+                padding: 12px;
+                background: #2a2a3a;
+                border: 1px solid #e4e2e2;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 12px;
+                word-break: break-all;
+                color: #c9d1d9;
+                margin-bottom: 8px;
+            }
+            button {
+                padding: 10px 16px;
+                background: #1bd96a;
+                color: #1e1e2e;
+                border: none;
+                border-radius: 4px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            button:hover {
+                background: #19c25e;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Modrinth Embeds</h1>
+            <p class="subtitle">Generate embeddable SVG cards and badges for Modrinth projects, users, organizations, and collections</p>
 
-        <div class="section">
-            <h2>Type</h2>
-            <div class="input-group">
-                <select id="embedType">
-                    <option value="card">Card</option>
-                    <option value="badge">Badge</option>
-                </select>
+            <div class="section">
+                <h2>Type</h2>
+                <div class="input-group">
+                    <select id="embedType">
+                        <option value="card">Card</option>
+                        <option value="badge">Badge</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Target</h2>
+                <div class="input-group">
+                    <select id="targetType">
+                        <option value="user">User</option>
+                        <option value="project">Project</option>
+                        <option value="organization">Organization</option>
+                        <option value="collection">Collection</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section" id="badgeSection" style="display: none">
+                <h2>Badge Metric</h2>
+                <div class="input-group">
+                    <select id="badgeMetric">
+                        <option value="downloads">Downloads</option>
+                        <option value="followers">Followers</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Details</h2>
+                <div class="input-group">
+                    <label id="inputLabel">Username</label>
+                    <input type="text" id="identifier" placeholder="Enter username or project slug" />
+                </div>
+            </div>
+
+            <div id="preview" class="preview">
+                <img id="previewImg" src="" alt="Preview" />
+                <div class="url-output" id="urlOutput"></div>
+                <button class="copy-btn" onclick="copyUrl()">Copy URL</button>
             </div>
         </div>
 
-        <div class="section">
-            <h2>Target</h2>
-            <div class="input-group">
-                <select id="targetType">
-                    <option value="user">User</option>
-                    <option value="organization">Organization</option>
-                    <option value="project">Project</option>
-                </select>
-            </div>
-        </div>
+        <script>
+            const embedType = document.getElementById("embedType");
+            const targetType = document.getElementById("targetType");
+            const badgeSection = document.getElementById("badgeSection");
+            const badgeMetric = document.getElementById("badgeMetric");
+            const identifier = document.getElementById("identifier");
+            const inputLabel = document.getElementById("inputLabel");
+            const preview = document.getElementById("preview");
+            const previewImg = document.getElementById("previewImg");
+            const urlOutput = document.getElementById("urlOutput");
 
-        <div class="section" id="badgeSection" style="display: none;">
-            <h2>Badge Metric</h2>
-            <div class="input-group">
-                <select id="badgeMetric">
-                    <option value="downloads">Downloads</option>
-                    <option value="followers">Followers</option>
-                </select>
-            </div>
-        </div>
+            function updateBadgeOptions() {
+                const target = targetType.value;
+                badgeMetric.innerHTML = "";
 
-        <div class="section">
-            <h2>Details</h2>
-            <div class="input-group">
-                <label id="inputLabel">Username</label>
-                <input type="text" id="identifier" placeholder="Enter username or project slug">
-            </div>
-        </div>
-
-        <div id="preview" class="preview">
-            <img id="previewImg" src="" alt="Preview">
-            <div class="url-output" id="urlOutput"></div>
-            <button class="copy-btn" onclick="copyUrl()">Copy URL</button>
-        </div>
-    </div>
-
-    <script>
-        const embedType = document.getElementById('embedType');
-        const targetType = document.getElementById('targetType');
-        const badgeSection = document.getElementById('badgeSection');
-        const badgeMetric = document.getElementById('badgeMetric');
-        const identifier = document.getElementById('identifier');
-        const inputLabel = document.getElementById('inputLabel');
-        const preview = document.getElementById('preview');
-        const previewImg = document.getElementById('previewImg');
-        const urlOutput = document.getElementById('urlOutput');
-
-        function updateBadgeOptions() {
-            const target = targetType.value;
-            badgeMetric.innerHTML = '';
-
-            if (target === 'user' || target === 'organization') {
-                badgeMetric.innerHTML = `
+                if (target === "user" || target === "organization" || target === "collection") {
+                    badgeMetric.innerHTML = `
                     <option value="downloads">Downloads</option>
                     <option value="followers">Followers</option>
                     <option value="projects">Projects</option>
                 `;
-            } else {
-                badgeMetric.innerHTML = `
+                } else {
+                    badgeMetric.innerHTML = `
                     <option value="downloads">Downloads</option>
                     <option value="followers">Followers</option>
                     <option value="versions">Versions</option>
                 `;
-            }
-        }
-
-        function updateUI() {
-            if (targetType.value === 'user') {
-                inputLabel.textContent = 'User';
-                identifier.placeholder = 'Enter username or id';
-            } else if (targetType.value === 'organization') {
-                inputLabel.textContent = 'Organization';
-                identifier.placeholder = 'Enter organization slug or id';
-            } else {
-                inputLabel.textContent = 'Project';
-                identifier.placeholder = 'Enter project slug or id';
+                }
             }
 
-            badgeSection.style.display = embedType.value === 'badge' ? 'block' : 'none';
-            updateBadgeOptions();
-            generate();
-        }
+            function updateUI() {
+                if (targetType.value === "user") {
+                    inputLabel.textContent = "User";
+                    identifier.placeholder = "Enter username or id";
+                } else if (targetType.value === "project") {
+                    inputLabel.textContent = "Project";
+                    identifier.placeholder = "Enter project slug or id";
+                } else if (targetType.value === "organization") {
+                    inputLabel.textContent = "Organization";
+                    identifier.placeholder = "Enter organization slug or id";
+                } else {
+                    inputLabel.textContent = "Collection";
+                    identifier.placeholder = "Enter collection id";
+                }
 
-        function generate() {
-            const type = targetType.value;
-            const id = identifier.value.trim();
-
-            if (!id) {
-                preview.classList.remove('active');
-                return;
+                badgeSection.style.display = embedType.value === "badge" ? "block" : "none";
+                updateBadgeOptions();
+                generate();
             }
 
-            let url;
-            if (embedType.value === 'card') {
-                url = `${window.location.origin}/${type}/${id}`;
-            } else {
-                const metric = badgeMetric.value;
-                url = `${window.location.origin}/${type}/${id}/${metric}`;
+            function generate() {
+                const type = targetType.value;
+                const id = identifier.value.trim();
+
+                if (!id) {
+                    preview.classList.remove("active");
+                    return;
+                }
+
+                let url;
+                if (embedType.value === "card") {
+                    url = `${window.location.origin}/${type}/${id}`;
+                } else {
+                    const metric = badgeMetric.value;
+                    url = `${window.location.origin}/${type}/${id}/${metric}`;
+                }
+
+                previewImg.src = url + "?t=" + Date.now();
+                urlOutput.textContent = url;
+                preview.classList.add("active");
             }
 
-            previewImg.src = url + '?t=' + Date.now();
-            urlOutput.textContent = url;
-            preview.classList.add('active');
-        }
+            embedType.addEventListener("change", updateUI);
+            targetType.addEventListener("change", updateUI);
+            badgeMetric.addEventListener("change", generate);
+            identifier.addEventListener("input", generate);
 
-        embedType.addEventListener('change', updateUI);
-        targetType.addEventListener('change', updateUI);
-        badgeMetric.addEventListener('change', generate);
-        identifier.addEventListener('input', generate);
+            function copyUrl() {
+                navigator.clipboard.writeText(urlOutput.textContent).then(() => {
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = "Copied!";
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                });
+            }
 
-        function copyUrl() {
-            navigator.clipboard.writeText(urlOutput.textContent).then(() => {
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = 'Copied!';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                }, 2000);
-            });
-        }
-
-        updateUI();
-    </script>
-</body>
+            updateUI();
+        </script>
+    </body>
 </html>

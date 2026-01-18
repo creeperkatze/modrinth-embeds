@@ -51,6 +51,15 @@ export class ModrinthClient {
     return this.fetch(`${MODRINTH_API_V3_URL}/organization/${id}/projects`);
   }
 
+  async getCollection(id) {
+    return this.fetch(`${MODRINTH_API_V3_URL}/collection/${id}`);
+  }
+
+  async getProjects(ids) {
+    const idsParam = JSON.stringify(ids);
+    return this.fetch(`${MODRINTH_API_URL}/projects?ids=${encodeURIComponent(idsParam)}`);
+  }
+
   async fetchImageAsBase64(url) {
     if (!url) return null;
     try {
@@ -321,6 +330,50 @@ export class ModrinthClient {
         loaders,
         topCategories,
         recentProject
+      }
+    };
+  }
+
+  async getCollectionStats(id) {
+    const collection = await this.getCollection(id);
+
+    // Fetch all projects in the collection
+    const projects = collection.projects && collection.projects.length > 0
+      ? await this.getProjects(collection.projects)
+      : [];
+
+    // Fetch collection icon as base64
+    if (collection.icon_url) {
+      collection.icon_url_base64 = await this.fetchImageAsBase64(collection.icon_url);
+    }
+
+    // Fetch project icons as base64
+    await Promise.all(
+      projects.map(async (project) => {
+        if (project.icon_url) {
+          project.icon_url_base64 = await this.fetchImageAsBase64(project.icon_url);
+        }
+      })
+    );
+
+    // Calculate aggregate statistics
+    const totalDownloads = projects.reduce((sum, project) => sum + (project.downloads || 0), 0);
+    const totalFollowers = projects.reduce((sum, project) => sum + (project.followers || 0), 0);
+    const projectCount = projects.length;
+
+    // Sort projects by downloads for top projects
+    const topProjects = [...projects]
+      .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+      .slice(0, 5);
+
+    return {
+      collection,
+      projects,
+      stats: {
+        totalDownloads,
+        totalFollowers,
+        projectCount,
+        topProjects
       }
     };
   }

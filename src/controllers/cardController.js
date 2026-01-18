@@ -3,6 +3,7 @@ import cache from '../utils/cache.js';
 import { generateUserCard } from '../generators/userCard.js';
 import { generateProjectCard } from '../generators/projectCard.js';
 import { generateOrganizationCard } from '../generators/organizationCard.js';
+import { generateCollectionCard } from '../generators/collectionCard.js';
 import logger from '../utils/logger.js';
 
 const MAX_AGE = Math.floor(cache.ttl / 1000);
@@ -102,3 +103,35 @@ const handleOrganizationCardRequest = async (req, res, next, cardType, generator
 
 export const getOrganization = (req, res, next) =>
   handleOrganizationCardRequest(req, res, next, 'organization', generateOrganizationCard);
+
+const handleCollectionCardRequest = async (req, res, next, cardType, generator) => {
+  try {
+    const { id } = req.params;
+    const theme = req.query.theme || 'dark';
+    const cacheKey = `${cardType}:${id}:${theme}`;
+
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      logger.info(`Showing ${cardType} card for "${id}" (cached)`);
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
+      return res.send(cached);
+    }
+
+    const data = await modrinthClient.getCollectionStats(id);
+    const svg = generator(data, theme);
+
+    cache.set(cacheKey, svg);
+    logger.info(`Showing ${cardType} card for "${id}"`);
+
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', `public, max-age=${MAX_AGE}`);
+    res.send(svg);
+  } catch (err) {
+    logger.error(`Error showing ${cardType} card for "${req.params.id}": ${err.message}`);
+    next(err);
+  }
+};
+
+export const getCollection = (req, res, next) =>
+  handleCollectionCardRequest(req, res, next, 'collection', generateCollectionCard);

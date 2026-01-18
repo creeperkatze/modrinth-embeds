@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import userRoutes from './routes/userRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import organizationRoutes from './routes/organizationRoutes.js';
+import collectionRoutes from './routes/collectionRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config({ quiet: true });
@@ -18,7 +19,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.static(path.join(dirname, '..', 'public')));
 
-app.use('/', userRoutes, projectRoutes, organizationRoutes);
+app.use('/', userRoutes, projectRoutes, organizationRoutes, collectionRoutes);
 
 app.use(errorHandler);
 

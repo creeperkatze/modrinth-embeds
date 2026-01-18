@@ -39,11 +39,13 @@ export function errorHandler(err, req, res, next) {
 
   if (err.message.includes('not found')) {
     statusCode = 404;
-    // Determine if this is a project, user, or organization request
+    // Determine if this is a project, user, organization, or collection request
     const isProjectRequest = req.path.includes('/project/');
     const isOrganizationRequest = req.path.includes('/organization/');
+    const isCollectionRequest = req.path.includes('/collection/');
     message = isProjectRequest ? 'Project not found' :
               isOrganizationRequest ? 'Organization not found' :
+              isCollectionRequest ? 'Collection not found' :
               'User not found';
   } else if (err.message.includes('Modrinth API')) {
     statusCode = 502;

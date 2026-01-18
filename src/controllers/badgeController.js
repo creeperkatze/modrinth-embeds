@@ -65,3 +65,13 @@ export const getOrganizationProjects = (req, res, next) =>
 
 export const getOrganizationFollowers = (req, res, next) =>
   handleBadgeRequest(req, res, next, 'Followers', stats => formatNumber(stats.totalFollowers), modrinthClient.getOrganizationStats.bind(modrinthClient));
+
+// Collection badges
+export const getCollectionDownloads = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Downloads', stats => formatNumber(stats.totalDownloads), modrinthClient.getCollectionStats.bind(modrinthClient));
+
+export const getCollectionProjects = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Projects', stats => stats.projectCount.toString(), modrinthClient.getCollectionStats.bind(modrinthClient));
+
+export const getCollectionFollowers = (req, res, next) =>
+  handleBadgeRequest(req, res, next, 'Followers', stats => formatNumber(stats.totalFollowers), modrinthClient.getCollectionStats.bind(modrinthClient));
