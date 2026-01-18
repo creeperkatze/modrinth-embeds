@@ -18,10 +18,11 @@
                 background: #06060d;
                 color: #b0bac5;
                 min-height: 100vh;
-                padding: 2.5rem 1.25rem;
+                padding: 2.5rem 1.25rem 0;
                 display: flex;
-                align-items: center;
+                flex-direction: column;
                 justify-content: center;
+                align-items: center;
                 font-weight: 500;
             }
 
@@ -188,7 +189,10 @@
         <div class="card">
             <div class="card-content">
                 <div class="left-panel">
-                    <h1>Modrinth Embeds</h1>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <img src="/favicon.svg" alt="Modrinth Logo" style="width: 2rem; height: 2rem;" />
+                        <h1>Modrinth Embeds</h1>
+                    </div>
                     <p class="subtitle">Generate embeddable cards and badges for Modrinth projects, users, organizations, and collections</p>
 
                     <div class="section">
@@ -393,5 +397,9 @@
 
             updateUI();
         </script>
+
+        <footer style="text-align: center; padding: 2rem 1.25rem 1rem; font-size: 1rem; color: #929aa3;">
+            Made with &hearts; by <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" style="color: #1bd96a; text-decoration: none;">Creeperkatze</a> · Not affiliated with Modrinth
+        </footer>
     </body>
 </html>
