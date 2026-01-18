@@ -22,6 +22,13 @@ app.use(express.static(path.join(dirname, "..", "public")));
 
 app.use("/", userRoutes, projectRoutes, organizationRoutes, collectionRoutes, metaRoutes);
 
+app.use((req, res) =>
+{
+    res.status(404).json({
+        error: "Not Found",
+    });
+});
+
 app.use(errorHandler);
 
 app.listen(port, () =>
