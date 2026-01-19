@@ -1,0 +1,5 @@
+{
+  "name": "modrinth-embeds",
+  "compatibility_date": "2026-01-19",
+  "main": "src/server.js"
+}
