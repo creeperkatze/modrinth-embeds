@@ -1,4 +1,4 @@
-# Modrinth Embeds
+# <img src=".github/assets/logo.svg" alt="Logo" width="600">
 
 Generate beautiful, embeddable cards and badges for Modrinth projects, users, organizations, and collections.
 
