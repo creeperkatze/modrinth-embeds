@@ -2,6 +2,8 @@ import { formatNumber, escapeXml, truncateText, generateSparkline } from "../uti
 import { ICONS } from "../constants/icons.js";
 import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js";
 
+const EMBED_VERSION = process.env.npm_package_version;
+
 export function getThemeColors(theme = "dark", customColor = null)
 {
     const isDark = theme === "dark";
@@ -335,5 +337,28 @@ export function generateAttribution(height, colors)
   <!-- Bottom right attribution -->
   <text x="445" y="${height - 5}" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end" opacity="0.6">
     modrinth-embeds.creeperkatze.de
+  </text>`;
+}
+
+export function generateInfo(height, colors)
+{
+    const now = new Date();
+    const dateTimeStr = now.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    return `
+  <!-- Bottom left version + date -->
+  <text x="5" y="${height - 5}"
+        font-family="'Segoe UI', Ubuntu, sans-serif"
+        font-size="10"
+        fill="${colors.textColor}"
+        text-anchor="start"
+        opacity="0.6">
+    v${EMBED_VERSION} • ${dateTimeStr}
   </text>`;
 }

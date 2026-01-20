@@ -8,7 +8,8 @@ import {
     generateStatsGrid,
     generateDivider,
     generateProjectList,
-    generateAttribution
+    generateAttribution,
+    generateInfo
 } from "./svgComponents.js";
 
 const DEFAULT_PROJECTS_COUNT = 5;
@@ -41,7 +42,9 @@ ${generateProfileImage(collection.icon_url_base64 || collection.icon_url, "colle
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
 ${generateProjectList(topProjects, "Projects", colors)}
-${generateAttribution(height, colors)}`;
+${generateInfo(height, colors)}
+${generateAttribution(height, colors)}
+`;
 
     return generateSvgWrapper(450, height, colors, content);
 }

@@ -1,4 +1,5 @@
 import { generateBadge } from "../generators/badge.js";
+import { generateAttribution, generateInfo } from "../generators/svgComponents.js";
 
 function generateErrorCard(message, detailText = "")
 {
@@ -38,10 +39,8 @@ function generateErrorCard(message, detailText = "")
       ${truncatedDetail}
     </text>` : ""}
 
-    <!-- Bottom right attribution -->
-    <text x="445" y="115" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="10" fill="${detailTextColor}" text-anchor="end" opacity="0.6">
-    modrinth-embeds.creeperkatze.de
-    </text>
+    ${generateInfo(120, { textColor: detailTextColor })}
+    ${generateAttribution(120, { textColor: detailTextColor })}
   </g>
 </svg>`.trim();
 }

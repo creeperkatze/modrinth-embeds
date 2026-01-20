@@ -9,8 +9,10 @@ import {
     generateStatsGrid,
     generateDivider,
     generateVersionList,
-    generateAttribution
+    generateAttribution,
+    generateInfo
 } from "./svgComponents.js";
+
 
 const DEFAULT_VERSIONS_COUNT = 5;
 
@@ -57,15 +59,27 @@ ${generateActivitySparkline(versionDates, colors)}
   </svg>
 
   <!-- Title -->
-  <text x="87" y="35" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="20" font-weight="bold" fill="${colors.textColor}">
+  <text x="87" y="35" font-family="'Segoe UI', Ubuntu, sans-serif"
+        font-size="20" font-weight="bold" fill="${colors.textColor}">
     ${project.title.length > 22 ? project.title.substring(0, 22) + "..." : project.title}
   </text>
 
-${generateRectImage(project.icon_url_base64 || project.icon_url, "project-image-clip", 365, 25, 70, 70, 14, colors)}
+${generateRectImage(
+        project.icon_url_base64 || project.icon_url,
+        "project-image-clip",
+        365,
+        25,
+        70,
+        70,
+        14,
+        colors
+    )}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
 ${generateVersionList(latestVersions, colors)}
-${generateAttribution(height, colors)}`;
+${generateInfo(height, colors)}
+${generateAttribution(height, colors)}
+`;
 
     return generateSvgWrapper(450, height, colors, content);
 }
