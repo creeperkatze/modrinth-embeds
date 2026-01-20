@@ -11,22 +11,22 @@ const MAX_AGE = Math.floor(cache.ttl / 1000);
 const CARD_CONFIGS = {
     user: {
         paramKey: "username",
-        dataFetcher: (client, id) => client.getUserStats(id),
+        dataFetcher: (client, id, options) => client.getUserStats(id, options.maxProjects),
         generator: generateUserCard
     },
     project: {
         paramKey: "slug",
-        dataFetcher: (client, id) => client.getProjectStats(id),
+        dataFetcher: (client, id, options) => client.getProjectStats(id, options.maxVersions),
         generator: generateProjectCard
     },
     organization: {
         paramKey: "id",
-        dataFetcher: (client, id) => client.getOrganizationStats(id),
+        dataFetcher: (client, id, options) => client.getOrganizationStats(id, options.maxProjects),
         generator: generateOrganizationCard
     },
     collection: {
         paramKey: "id",
-        dataFetcher: (client, id) => client.getCollectionStats(id),
+        dataFetcher: (client, id, options) => client.getCollectionStats(id, options.maxProjects),
         generator: generateCollectionCard
     }
 };
@@ -36,7 +36,17 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const config = CARD_CONFIGS[cardType];
         const identifier = req.params[config.paramKey];
         const theme = req.query.theme || "dark";
-        const cacheKey = `${cardType}:${identifier}:${theme}`;
+
+        // Parse customization options
+        const options = {
+            showProjects: req.query.showProjects !== "false",
+            showVersions: req.query.showVersions !== "false",
+            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 50),
+            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 50),
+            color: req.query.color ? `#${req.query.color.replace(/^#/, '')}` : null
+        };
+
+        const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;
 
         const cached = cache.get(cacheKey);
         if (cached) {
@@ -46,8 +56,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
             return res.send(cached);
         }
 
-        const data = await config.dataFetcher(modrinthClient, identifier);
-        const svg = config.generator(data, theme);
+        const data = await config.dataFetcher(modrinthClient, identifier, options);
+        const svg = config.generator(data, theme, options);
 
         cache.set(cacheKey, svg);
         logger.info(`Showing ${cardType} card for "${identifier}"`);

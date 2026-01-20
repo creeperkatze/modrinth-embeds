@@ -35,6 +35,7 @@
                 justify-content: center;
                 align-items: center;
                 font-weight: 500;
+                overflow-y: scroll;
             }
 
             .card {
@@ -126,6 +127,39 @@
             select:focus {
                 outline: none;
                 border-color: #1bd96a;
+            }
+
+            input[type="checkbox"] {
+                width: 18px !important;
+                height: 18px;
+                min-width: 18px;
+                flex-shrink: 0;
+                appearance: none;
+                -webkit-appearance: none;
+                background: #3c3c40;
+                border: 2px solid #929aa3;
+                border-radius: 0.25rem;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.2s;
+                padding: 0;
+            }
+
+            input[type="checkbox"]:checked {
+                background: #1bd96a;
+                border-color: #1bd96a;
+            }
+
+            input[type="checkbox"]:checked::after {
+                content: "";
+                position: absolute;
+                left: 4px;
+                top: 1px;
+                width: 4px;
+                height: 8px;
+                border: solid #000;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
             }
 
             .preview-container,
@@ -263,6 +297,53 @@
                         <h2>Value</h2>
                         <input type="text" id="identifier" placeholder="Enter username or project slug" />
                     </div>
+
+                    <hr class="divider" />
+
+                    <div class="section" style="margin-bottom: 0">
+                        <button id="customizationToggle" style="width: 100%; display: flex; align-items: center; justify-content: space-between; background: transparent; color: #c4cfdd; padding: 0.5rem 0; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer">
+                            <span>Customization</span>
+                            <svg id="customizationChevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="customizationContent" style="display: none">
+                        <div class="section" id="showProjectsSection">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer">
+                                <input type="checkbox" id="showProjects" checked style="width: auto; cursor: pointer" />
+                                <span style="font-size: 0.875rem; color: #c4cfdd">Show Projects</span>
+                            </label>
+                        </div>
+
+                        <div class="section" id="maxProjectsSection">
+                            <h2>Max Projects (1-50)</h2>
+                            <input type="number" id="maxProjects" min="1" max="50" value="5" />
+                        </div>
+
+                        <div class="section" id="showVersionsSection" style="display: none">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer">
+                                <input type="checkbox" id="showVersions" checked style="width: auto; cursor: pointer" />
+                                <span style="font-size: 0.875rem; color: #c4cfdd">Show Versions</span>
+                            </label>
+                        </div>
+
+                        <div class="section" id="maxVersionsSection" style="display: none">
+                            <h2>Max Versions (1-50)</h2>
+                            <input type="number" id="maxVersions" min="1" max="50" value="5" />
+                        </div>
+
+                        <div class="section">
+                            <h2>Accent Color</h2>
+                            <div id="colorButtons" style="display: flex; flex-wrap: wrap; gap: 0.5rem"></div>
+                        </div>
+                    </div>
+
+                    <div class="section" id="badgeColorSection" style="display: none">
+                        <h2>Accent Color</h2>
+                        <div id="badgeColorButtons" style="display: flex; flex-wrap: wrap; gap: 0.5rem"></div>
+                    </div>
                 </div>
 
                 <div class="right-panel">
@@ -324,6 +405,85 @@
             const htmlPlaceholder = document.getElementById("htmlPlaceholder");
             const copyMarkdownBtn = document.getElementById("copyMarkdownBtn");
             const copyHtmlBtn = document.getElementById("copyHtmlBtn");
+            const showProjects = document.getElementById("showProjects");
+            const maxProjects = document.getElementById("maxProjects");
+            const showVersions = document.getElementById("showVersions");
+            const maxVersions = document.getElementById("maxVersions");
+            const colorButtons = document.getElementById("colorButtons");
+            const badgeColorButtons = document.getElementById("badgeColorButtons");
+            const badgeColorSection = document.getElementById("badgeColorSection");
+            const showProjectsSection = document.getElementById("showProjectsSection");
+            const maxProjectsSection = document.getElementById("maxProjectsSection");
+            const showVersionsSection = document.getElementById("showVersionsSection");
+            const maxVersionsSection = document.getElementById("maxVersionsSection");
+
+            let selectedColor = "1bd96a";
+
+            // HSL to Hex conversion (S=100%, L=75%)
+            function hslToHex(h) {
+                const s = 1, l = 0.75;
+                const c = (1 - Math.abs(2 * l - 1)) * s;
+                const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+                const m = l - c / 2;
+                let r, g, b;
+
+                if (h < 60) { r = c; g = x; b = 0; }
+                else if (h < 120) { r = x; g = c; b = 0; }
+                else if (h < 180) { r = 0; g = c; b = x; }
+                else if (h < 240) { r = 0; g = x; b = c; }
+                else if (h < 300) { r = x; g = 0; b = c; }
+                else { r = c; g = 0; b = x; }
+
+                const toHex = (val) => Math.round((val + m) * 255).toString(16).padStart(2, '0');
+                return toHex(r) + toHex(g) + toHex(b);
+            }
+
+            // Create color buttons
+            const defaultColor = "1bd96a";
+            const hues = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270];
+            const colors = [defaultColor, ...hues.map(h => hslToHex(h))];
+
+            function createColorButton(color, container) {
+                const btn = document.createElement("button");
+                btn.style.cssText = `
+                    width: 40px;
+                    height: 40px;
+                    padding: 0;
+                    background: #${color};
+                    border: 2px solid ${color === selectedColor ? '#fff' : 'transparent'};
+                    border-radius: 0.5rem;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                `;
+                btn.dataset.color = color;
+                btn.onclick = () => {
+                    selectedColor = color;
+                    // Update all color buttons
+                    document.querySelectorAll('[data-color]').forEach(b => {
+                        b.style.border = `2px solid ${b.dataset.color === selectedColor ? '#fff' : 'transparent'}`;
+                    });
+                    generate();
+                    updateUrl();
+                };
+                container.appendChild(btn);
+            }
+
+            colors.forEach(color => {
+                createColorButton(color, colorButtons);
+                createColorButton(color, badgeColorButtons);
+            });
+
+            // Customization toggle
+            const customizationToggle = document.getElementById("customizationToggle");
+            const customizationContent = document.getElementById("customizationContent");
+            const customizationChevron = document.getElementById("customizationChevron");
+            let customizationExpanded = false;
+
+            customizationToggle.addEventListener("click", () => {
+                customizationExpanded = !customizationExpanded;
+                customizationContent.style.display = customizationExpanded ? "block" : "none";
+                customizationChevron.style.transform = customizationExpanded ? "rotate(180deg)" : "rotate(0deg)";
+            });
 
             // URL state management functions
             function getUrlParams() {
@@ -333,6 +493,11 @@
                     target: params.get("target") || "user",
                     metric: params.get("metric") || "downloads",
                     value: params.get("value") || "",
+                    showProjects: params.get("showProjects") !== "false",
+                    maxProjects: parseInt(params.get("maxProjects")) || 5,
+                    showVersions: params.get("showVersions") !== "false",
+                    maxVersions: parseInt(params.get("maxVersions")) || 5,
+                    color: params.get("color") || "1bd96a"
                 };
             }
 
@@ -344,9 +509,18 @@
                 const value = identifier.value.trim();
 
                 if (type !== "card") params.set("type", type);
-                if (target !== "user") params.set("target", target);
+                params.set("target", target);
                 if (metric !== "downloads") params.set("metric", metric);
                 if (value) params.set("value", value);
+
+                // Only add customization params for cards
+                if (type === "card") {
+                    if (!showProjects.checked) params.set("showProjects", "false");
+                    if (maxProjects.value !== "5") params.set("maxProjects", maxProjects.value);
+                    if (!showVersions.checked) params.set("showVersions", "false");
+                    if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
+                    if (selectedColor !== "1bd96a") params.set("color", selectedColor);
+                }
 
                 const newUrl = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
                 window.history.replaceState(null, "", newUrl);
@@ -358,6 +532,15 @@
                 targetType.value = params.target;
                 badgeMetric.value = params.metric;
                 identifier.value = params.value;
+                showProjects.checked = params.showProjects;
+                maxProjects.value = params.maxProjects;
+                showVersions.checked = params.showVersions;
+                maxVersions.value = params.maxVersions;
+                selectedColor = params.color;
+                // Update all color button selections
+                document.querySelectorAll('[data-color]').forEach(b => {
+                    b.style.border = `2px solid ${b.dataset.color === selectedColor ? '#fff' : 'transparent'}`;
+                });
             }
 
             function parseModrinthUrl(url) {
@@ -417,8 +600,22 @@
                     collection: "Enter collection id",
                 };
                 identifier.placeholder = placeholders[targetType.value] || "";
-                badgeSection.style.display = embedType.value === "badge" ? "block" : "none";
+                const isCard = embedType.value === "card";
+                const isBadge = embedType.value === "badge";
+
+                badgeSection.style.display = isBadge ? "block" : "none";
+                badgeColorSection.style.display = isBadge ? "block" : "none";
                 updateBadgeOptions();
+
+                // Show/hide customization sections based on target type
+                const isProject = targetType.value === "project";
+                const isUserOrgOrCollection = ["user", "organization", "collection"].includes(targetType.value);
+
+                showProjectsSection.style.display = isCard && isUserOrgOrCollection ? "block" : "none";
+                maxProjectsSection.style.display = isCard && isUserOrgOrCollection && showProjects.checked ? "block" : "none";
+                showVersionsSection.style.display = isCard && isProject ? "block" : "none";
+                maxVersionsSection.style.display = isCard && isProject && showVersions.checked ? "block" : "none";
+
                 generate();
             }
 
@@ -451,7 +648,37 @@
                 previewPlaceholder.style.display = "inline";
                 previewLink.style.display = "none";
 
-                const url = embedType.value === "card" ? `${window.location.origin}/${type}/${identifierValue}` : `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}`;
+                // Build URL with customization parameters
+                let url;
+                if (embedType.value === "card") {
+                    const urlParams = new URLSearchParams();
+                    if (!showProjects.checked && ["user", "organization", "collection"].includes(type)) {
+                        urlParams.set("showProjects", "false");
+                    }
+                    if (maxProjects.value !== "5" && ["user", "organization", "collection"].includes(type)) {
+                        urlParams.set("maxProjects", maxProjects.value);
+                    }
+                    if (!showVersions.checked && type === "project") {
+                        urlParams.set("showVersions", "false");
+                    }
+                    if (maxVersions.value !== "5" && type === "project") {
+                        urlParams.set("maxVersions", maxVersions.value);
+                    }
+                    if (selectedColor !== "1bd96a") {
+                        urlParams.set("color", selectedColor);
+                    }
+
+                    const queryString = urlParams.toString();
+                    url = `${window.location.origin}/${type}/${identifierValue}${queryString ? '?' + queryString : ''}`;
+                } else {
+                    const badgeParams = new URLSearchParams();
+                    if (selectedColor !== "1bd96a") {
+                        badgeParams.set("color", selectedColor);
+                    }
+                    const badgeQuery = badgeParams.toString();
+                    url = `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? '?' + badgeQuery : ''}`;
+                }
+
                 const modrinthUrl = `https://modrinth.com/${type}/${identifierValue}`;
 
                 markdownOutput.classList.remove("empty");
@@ -463,7 +690,7 @@
                 copyMarkdownBtn.disabled = false;
                 copyHtmlBtn.disabled = false;
 
-                previewImg.src = `${url}?t=${Date.now()}`;
+                previewImg.src = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
                 previewImg.onload = async () => {
                     const endTime = performance.now();
                     const generationTime = Math.round(endTime - startTime);
@@ -512,6 +739,22 @@
                 updateUrl();
             });
             identifier.addEventListener("input", () => {
+                generate();
+                updateUrl();
+            });
+            showProjects.addEventListener("change", () => {
+                updateUI();
+                updateUrl();
+            });
+            maxProjects.addEventListener("input", () => {
+                generate();
+                updateUrl();
+            });
+            showVersions.addEventListener("change", () => {
+                updateUI();
+                updateUrl();
+            });
+            maxVersions.addEventListener("input", () => {
                 generate();
                 updateUrl();
             });

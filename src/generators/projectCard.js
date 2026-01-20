@@ -7,21 +7,28 @@ import {
     generateActivitySparkline,
     generateRectImage,
     generateStatsGrid,
+    generateDivider,
     generateVersionList,
     generateAttribution
 } from "./svgComponents.js";
 
-const TOP_VERSIONS_COUNT = 5;
+const DEFAULT_VERSIONS_COUNT = 5;
 
-export function generateProjectCard(data, theme = "dark")
+export function generateProjectCard(data, theme = "dark", options = {})
 {
     const { project, versions, stats } = data;
-    const colors = getThemeColors(theme);
+    const {
+        showVersions = true,
+        maxVersions = DEFAULT_VERSIONS_COUNT,
+        color = null
+    } = options;
+
+    const colors = getThemeColors(theme, color);
 
     const projectTypeIconName = getProjectTypeIcon(project.project_type);
-    const latestVersions = versions.slice(0, TOP_VERSIONS_COUNT);
-    const hasVersions = latestVersions.length > 0;
-    const height = hasVersions ? 150 + (latestVersions.length * 50) : 110;
+    const latestVersions = showVersions ? versions.slice(0, maxVersions) : [];
+    const hasVersions = showVersions && latestVersions.length > 0;
+    const height = hasVersions ? 150 + (latestVersions.length * 50) : 120;
 
     const versionDates = versions.map(v => v.date_published);
 
@@ -56,7 +63,8 @@ ${generateActivitySparkline(versionDates, colors)}
 
 ${generateRectImage(project.icon_url_base64 || project.icon_url, "project-image-clip", 365, 25, 70, 70, 14, colors)}
 ${generateStatsGrid(statsData, colors)}
-${hasVersions ? generateVersionList(latestVersions, colors) : ""}
+${generateDivider(colors)}
+${generateVersionList(latestVersions, colors)}
 ${generateAttribution(height, colors)}`;
 
     return generateSvgWrapper(450, height, colors, content);

@@ -9,8 +9,8 @@ const MODRINTH_API_URL = process.env.MODRINTH_API_URL;
 const MODRINTH_API_V3_URL = process.env.MODRINTH_API_V3_URL;
 const USER_AGENT = process.env.USER_AGENT;
 
-// Number of top projects to display (configurable)
-const TOP_PROJECTS_COUNT = 5;
+// Default number of top projects to display
+const DEFAULT_TOP_PROJECTS_COUNT = 5;
 
 export class ModrinthClient
 {
@@ -84,7 +84,7 @@ export class ModrinthClient
         return this.fetch(`${MODRINTH_API_URL}/projects?ids=${encodeURIComponent(idsParam)}`);
     }
 
-    async getUserStats(username)
+    async getUserStats(username, maxProjects = DEFAULT_TOP_PROJECTS_COUNT)
     {
         const [user, projects] = await Promise.all([
             this.getUser(username),
@@ -92,7 +92,7 @@ export class ModrinthClient
         ]);
 
         // Use combined aggregation for single-pass efficiency
-        const stats = aggregateAllStats(projects, TOP_PROJECTS_COUNT);
+        const stats = aggregateAllStats(projects, maxProjects);
         const topProjects = stats.topProjects;
 
         // Parallelize all async operations - only fetch data for top N projects
@@ -114,7 +114,7 @@ export class ModrinthClient
         };
     }
 
-    async getProjectStats(slug)
+    async getProjectStats(slug, maxVersions = DEFAULT_TOP_PROJECTS_COUNT)
     {
         const [project, versions] = await Promise.all([
             this.getProject(slug),
@@ -128,7 +128,7 @@ export class ModrinthClient
 
         const latestVersions = [...versions]
             .sort((a, b) => new Date(b.date_published) - new Date(a.date_published))
-            .slice(0, 5);
+            .slice(0, maxVersions);
 
         return {
             project,
@@ -141,7 +141,7 @@ export class ModrinthClient
         };
     }
 
-    async getOrganizationStats(id)
+    async getOrganizationStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT)
     {
         const [organization, rawProjects] = await Promise.all([
             this.getOrganization(id),
@@ -151,7 +151,7 @@ export class ModrinthClient
         const projects = normalizeV3ProjectFields(rawProjects);
 
         // Use combined aggregation for single-pass efficiency
-        const stats = aggregateAllStats(projects, TOP_PROJECTS_COUNT);
+        const stats = aggregateAllStats(projects, maxProjects);
         const topProjects = stats.topProjects;
 
         // Parallelize all async operations - only fetch data for top N projects
@@ -173,7 +173,7 @@ export class ModrinthClient
         };
     }
 
-    async getCollectionStats(id)
+    async getCollectionStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT)
     {
         const collection = await this.getCollection(id);
 
@@ -182,7 +182,7 @@ export class ModrinthClient
             : [];
 
         // Use optimized aggregation - only basic stats needed for collections
-        const { totalDownloads, totalFollowers, projectCount, topProjects } = aggregateProjectStats(projects, TOP_PROJECTS_COUNT);
+        const { totalDownloads, totalFollowers, projectCount, topProjects } = aggregateProjectStats(projects, maxProjects);
 
         // Parallelize all async operations - only fetch data for top N projects
         const [allVersionDates] = await Promise.all([

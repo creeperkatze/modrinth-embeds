@@ -2,13 +2,19 @@ import { formatNumber, escapeXml, truncateText, generateSparkline } from "../uti
 import { ICONS } from "../constants/icons.js";
 import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js";
 
-export function getThemeColors(theme = "dark")
+export function getThemeColors(theme = "dark", customColor = null)
 {
     const isDark = theme === "dark";
+    const defaultAccentColor = "#1bd96a";
+
+    // Validate hex color format
+    const isValidHex = customColor && /^#[0-9A-F]{6}$/i.test(customColor);
+    const accentColor = isValidHex ? customColor : defaultAccentColor;
+
     return {
         bgColor: "transparent",
         textColor: isDark ? "#c9d1d9" : "#1e1e2e",
-        accentColor: isDark ? "#1bd96a" : "#1bd96a",
+        accentColor,
         borderColor: "#E4E2E2"
     };
 }
@@ -212,6 +218,13 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
   </g>`;
 }
 
+export function generateDivider(colors)
+{
+    return `
+  <!-- Divider -->
+  <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+}
+
 export function generateProjectList(topProjects, sectionTitle, colors)
 {
     if (!topProjects || topProjects.length === 0) return "";
@@ -222,9 +235,6 @@ export function generateProjectList(topProjects, sectionTitle, colors)
     ).join("");
 
     return `
-  <!-- Divider -->
-  <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
-
   <!-- Projects Header -->
   <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
     ${sectionTitle}
@@ -311,9 +321,6 @@ export function generateVersionList(versions, colors)
     ).join("");
 
     return `
-  <!-- Divider -->
-  <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>
-
   <!-- Latest Versions Header -->
   <text x="15" y="130" font-family="'Segoe UI', Ubuntu, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
     Latest Versions

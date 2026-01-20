@@ -6,20 +6,27 @@ import {
     generateHeader,
     generateProfileImage,
     generateStatsGrid,
+    generateDivider,
     generateProjectList,
     generateAttribution
 } from "./svgComponents.js";
 
-const TOP_PROJECTS_COUNT = 5;
+const DEFAULT_PROJECTS_COUNT = 5;
 
-export function generateCollectionCard(data, theme = "dark")
+export function generateCollectionCard(data, theme = "dark", options = {})
 {
     const { collection, stats } = data;
-    const colors = getThemeColors(theme);
+    const {
+        showProjects = true,
+        maxProjects = DEFAULT_PROJECTS_COUNT,
+        color = null
+    } = options;
 
-    const topProjects = stats.topProjects.slice(0, TOP_PROJECTS_COUNT);
-    const hasProjects = topProjects.length > 0;
-    const height = hasProjects ? 150 + (topProjects.length * 50) : 120;
+    const colors = getThemeColors(theme, color);
+
+    const topProjects = showProjects ? stats.topProjects.slice(0, maxProjects) : [];
+    const hasProjects = showProjects && topProjects.length > 0;
+    const height = hasProjects ? 150 + (topProjects.length * 50) : 130;
 
     const statsData = [
         { x: 15, label: "Total Downloads", value: formatNumber(stats.totalDownloads) },
@@ -32,7 +39,8 @@ ${generateActivitySparkline(stats.allVersionDates || [], colors)}
 ${generateHeader("collection", "collection", collection.name, colors)}
 ${generateProfileImage(collection.icon_url_base64 || collection.icon_url, "collection-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
-${hasProjects ? generateProjectList(topProjects, "Projects", colors) : ""}
+${generateDivider(colors)}
+${generateProjectList(topProjects, "Projects", colors)}
 ${generateAttribution(height, colors)}`;
 
     return generateSvgWrapper(450, height, colors, content);

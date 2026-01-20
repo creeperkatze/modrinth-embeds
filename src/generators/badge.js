@@ -11,7 +11,7 @@ export function generateBadge(label, value, color = "#1bd96a")
 
     const bgColor = "transparent";
     const labelTextColor = "#8b949e";
-    const valueTextColor = "#1bd96a";
+    const valueTextColor = color;
     const borderColor = "#E4E2E2";
 
     return `
