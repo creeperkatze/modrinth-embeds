@@ -28,7 +28,7 @@ export function generateProjectCard(data, theme = "dark", options = {})
     const projectTypeIconName = getProjectTypeIcon(project.project_type);
     const latestVersions = showVersions ? versions.slice(0, maxVersions) : [];
     const hasVersions = showVersions && latestVersions.length > 0;
-    const height = hasVersions ? 150 + (latestVersions.length * 50) : 120;
+    const height = hasVersions ? 150 + (latestVersions.length * 50) : 130;
 
     const versionDates = versions.map(v => v.date_published);
 
