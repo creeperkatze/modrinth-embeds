@@ -17,30 +17,40 @@
                 theme: {
                     extend: {
                         colors: {
-                            'modrinth-green': '#1bd96a',
-                            'bg-dark': '#06060d',
-                            'card-bg': '#101014',
-                            'section-bg': '#1a1a1e',
-                            'input-bg': '#3c3c40',
-                            'border-dark': '#3a3a4a',
-                            'text-primary': '#b0bac5',
-                            'text-secondary': '#c4cfdd',
-                            'text-muted': '#929aa3',
-                            'text-bright': '#ecf9fb',
-                            'yellow': '#fbbf24'
-                        }
-                    }
-                }
-            }
+                            "modrinth-green": "#1bd96a",
+                            "bg-dark": "#06060d",
+                            "card-bg": "#101014",
+                            "section-bg": "#1a1a1e",
+                            "input-bg": "#3c3c40",
+                            "border-dark": "#3a3a4a",
+                            "text-primary": "#b0bac5",
+                            "text-secondary": "#c4cfdd",
+                            "text-muted": "#929aa3",
+                            "text-bright": "#ecf9fb",
+                            yellow: "#fbbf24",
+                        },
+                    },
+                },
+            };
         </script>
         <style>
             body {
-                background: #06060d url('/images/landing.webp');
-                font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, sans-serif;
+                background: #06060d url("/images/landing.webp");
+                font-family:
+                    Inter,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    Ubuntu,
+                    sans-serif;
             }
             @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
             }
             .loader-icon {
                 animation: spin 1s linear infinite;
@@ -87,7 +97,7 @@
                             <button id="basicToggle" class="w-full flex items-center justify-between bg-transparent text-text-secondary py-2 px-0 text-sm font-semibold border-none cursor-pointer">
                                 <h2 class="text-text-secondary text-2xl font-semibold">Configuration</h2>
                                 <svg id="basicChevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 rotate-180">
-                                    <path d="m6 9 6 6 6-6"/>
+                                    <path d="m6 9 6 6 6-6" />
                                 </svg>
                             </button>
                         </div>
@@ -138,7 +148,7 @@
                             <button id="customizationToggle" class="w-full flex items-center justify-between bg-transparent text-text-secondary py-2 px-0 text-sm font-semibold border-none cursor-pointer">
                                 <h2 class="text-text-secondary text-2xl font-semibold">Customization</h2>
                                 <svg id="customizationChevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200">
-                                    <path d="m6 9 6 6 6-6"/>
+                                    <path d="m6 9 6 6 6-6" />
                                 </svg>
                             </button>
                         </div>
@@ -210,42 +220,25 @@
                         </div>
                     </div>
 
-<div class="flex gap-2">
-    <button
-        class="py-2.5 px-4 bg-modrinth-green text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110 disabled:bg-input-bg disabled:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-        onclick="copyMarkdown()"
-        id="copyMarkdownBtn"
-        disabled
-    >
-        Copy Markdown
-    </button>
+                    <div class="flex gap-2">
+                        <button class="py-2.5 px-4 bg-modrinth-green text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110 disabled:bg-input-bg disabled:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed" onclick="copyMarkdown()" id="copyMarkdownBtn" disabled>Copy Markdown</button>
 
-    <button
-        class="py-2.5 px-4 bg-modrinth-green text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110 disabled:bg-input-bg disabled:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-        onclick="copyHtml()"
-        id="copyHtmlBtn"
-        disabled
-    >
-        Copy HTML
-    </button>
+                        <button class="py-2.5 px-4 bg-modrinth-green text-black border-none rounded-xl text-sm font-semibold cursor-pointer transition-[filter] duration-200 hover:brightness-110 disabled:bg-input-bg disabled:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed" onclick="copyHtml()" id="copyHtmlBtn" disabled>Copy HTML</button>
 
-    <a
-        href="/"
-        class="py-2.5 px-4 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold flex items-center gap-2 hover:brightness-110 no-underline"
-    >
-        <span>Reset</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
-        </svg>
-    </a>
-</div>
+                        <a href="/" class="py-2.5 px-4 bg-input-bg text-text-bright border border-border-dark rounded-xl text-sm font-semibold flex items-center gap-2 hover:brightness-110 no-underline">
+                            <span>Reset</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         <footer class="text-center py-8 px-5 pt-8 text-base text-text-muted font-semibold">
-            Made with &hearts; by <a href="https://github.com/creeperkatze" target="_blank" class="text-modrinth-green no-underline">Creeperkatze</a> · View <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" class="text-modrinth-green no-underline">Source</a> · <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" class="text-yellow no-underline">&starf; On Github</a> · Not affiliated with Modrinth
+            Made with &hearts; by <a href="https://github.com/creeperkatze" target="_blank" class="text-modrinth-green no-underline">Creeperkatze</a> · View <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" class="text-modrinth-green no-underline">Source</a> ·
+            <a href="https://github.com/creeperkatze/modrinth-embeds" target="_blank" class="text-yellow no-underline">&starf; On Github</a> · Not affiliated with Modrinth
         </footer>
         <script>
             const modrinthUrl = document.getElementById("modrinthUrl");
@@ -278,38 +271,61 @@
 
             // HSL to Hex conversion (S=100%, L=75%)
             function hslToHex(h) {
-                const s = 1, l = 0.75;
+                const s = 1,
+                    l = 0.75;
                 const c = (1 - Math.abs(2 * l - 1)) * s;
                 const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
                 const m = l - c / 2;
                 let r, g, b;
 
-                if (h < 60) { r = c; g = x; b = 0; }
-                else if (h < 120) { r = x; g = c; b = 0; }
-                else if (h < 180) { r = 0; g = c; b = x; }
-                else if (h < 240) { r = 0; g = x; b = c; }
-                else if (h < 300) { r = x; g = 0; b = c; }
-                else { r = c; g = 0; b = x; }
+                if (h < 60) {
+                    r = c;
+                    g = x;
+                    b = 0;
+                } else if (h < 120) {
+                    r = x;
+                    g = c;
+                    b = 0;
+                } else if (h < 180) {
+                    r = 0;
+                    g = c;
+                    b = x;
+                } else if (h < 240) {
+                    r = 0;
+                    g = x;
+                    b = c;
+                } else if (h < 300) {
+                    r = x;
+                    g = 0;
+                    b = c;
+                } else {
+                    r = c;
+                    g = 0;
+                    b = x;
+                }
 
-                const toHex = (val) => Math.round((val + m) * 255).toString(16).padStart(2, '0');
+                const toHex = (val) =>
+                    Math.round((val + m) * 255)
+                        .toString(16)
+                        .padStart(2, "0");
                 return toHex(r) + toHex(g) + toHex(b);
             }
 
             // Create color buttons
             const defaultColor = "1bd96a";
             const hues = [0, 30, 60, 90, 150, 180, 210, 240, 270, 330];
-            const colors = [defaultColor, ...hues.map(h => hslToHex(h))];
+            const colors = [defaultColor, ...hues.map((h) => hslToHex(h))];
 
             function createColorButton(color, container) {
                 const btn = document.createElement("button");
-                btn.className = 'color-btn' + (color === selectedColor ? ' color-btn-selected' : '');
+                btn.className = "color-btn" + (color === selectedColor ? " color-btn-selected" : "");
                 btn.style.background = `#${color}`;
                 btn.dataset.color = color;
                 btn.onclick = () => {
                     selectedColor = color;
                     // Update all color buttons
-                    document.querySelectorAll('[data-color]').forEach(b => {
-                        b.classList.toggle('color-btn-selected', b.dataset.color === selectedColor);
+                    document.querySelectorAll("[data-color]").forEach((b) => {
+                        b.classList.toggle("color-btn-selected", b.dataset.color === selectedColor);
                     });
                     generate();
                     updateUrl();
@@ -317,7 +333,7 @@
                 container.appendChild(btn);
             }
 
-            colors.forEach(color => {
+            colors.forEach((color) => {
                 createColorButton(color, colorButtons);
             });
 
@@ -329,8 +345,8 @@
 
             basicToggle.addEventListener("click", () => {
                 basicExpanded = !basicExpanded;
-                basicContent.classList.toggle('hidden', !basicExpanded);
-                basicChevron.classList.toggle('rotate-180', basicExpanded);
+                basicContent.classList.toggle("hidden", !basicExpanded);
+                basicChevron.classList.toggle("rotate-180", basicExpanded);
             });
 
             // Customization toggle
@@ -341,8 +357,8 @@
 
             customizationToggle.addEventListener("click", () => {
                 customizationExpanded = !customizationExpanded;
-                customizationContent.classList.toggle('hidden', !customizationExpanded);
-                customizationChevron.classList.toggle('rotate-180', customizationExpanded);
+                customizationContent.classList.toggle("hidden", !customizationExpanded);
+                customizationChevron.classList.toggle("rotate-180", customizationExpanded);
             });
 
             // URL state management functions
@@ -357,7 +373,7 @@
                     maxProjects: parseInt(params.get("maxProjects")) || 5,
                     showVersions: params.get("showVersions") !== "false",
                     maxVersions: parseInt(params.get("maxVersions")) || 5,
-                    color: params.get("color") || "1bd96a"
+                    color: params.get("color") || "1bd96a",
                 };
             }
 
@@ -398,8 +414,8 @@
                 maxVersions.value = params.maxVersions;
                 selectedColor = params.color;
                 // Update all color button selections
-                document.querySelectorAll('[data-color]').forEach(b => {
-                    b.classList.toggle('color-btn-selected', b.dataset.color === selectedColor);
+                document.querySelectorAll("[data-color]").forEach((b) => {
+                    b.classList.toggle("color-btn-selected", b.dataset.color === selectedColor);
                 });
             }
 
@@ -463,17 +479,17 @@
                 const isCard = embedType.value === "card";
                 const isBadge = embedType.value === "badge";
 
-                badgeSection.classList.toggle('hidden', !isBadge);
+                badgeSection.classList.toggle("hidden", !isBadge);
                 updateBadgeOptions();
 
                 // Show/hide customization sections based on target type
                 const isProject = targetType.value === "project";
                 const isUserOrgOrCollection = ["user", "organization", "collection"].includes(targetType.value);
 
-                showProjectsSection.classList.toggle('hidden', !(isCard && isUserOrgOrCollection));
-                maxProjectsSection.classList.toggle('hidden', !(isCard && isUserOrgOrCollection && showProjects.checked));
-                showVersionsSection.classList.toggle('hidden', !(isCard && isProject));
-                maxVersionsSection.classList.toggle('hidden', !(isCard && isProject && showVersions.checked));
+                showProjectsSection.classList.toggle("hidden", !(isCard && isUserOrgOrCollection));
+                maxProjectsSection.classList.toggle("hidden", !(isCard && isUserOrgOrCollection && showProjects.checked));
+                showVersionsSection.classList.toggle("hidden", !(isCard && isProject));
+                maxVersionsSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
 
                 generate();
             }
@@ -485,8 +501,8 @@
 
                 if (!identifierValue) {
                     previewContainer.classList.add("text-text-muted");
-                    previewPlaceholder.classList.remove('hidden');
-                    previewLink.classList.add('hidden');
+                    previewPlaceholder.classList.remove("hidden");
+                    previewLink.classList.add("hidden");
                     markdownOutput.classList.add("text-text-muted");
                     markdownOutput.innerHTML = '<span id="markdownPlaceholder">Your markdown code will appear here</span>';
                     htmlOutput.classList.add("text-text-muted");
@@ -494,18 +510,18 @@
                     copyMarkdownBtn.disabled = true;
                     copyHtmlBtn.disabled = true;
                     document.getElementById("generationTime").textContent = "";
-                    document.getElementById("generationIcon").classList.add('hidden');
-                    document.getElementById("loaderIcon").classList.add('hidden');
+                    document.getElementById("generationIcon").classList.add("hidden");
+                    document.getElementById("loaderIcon").classList.add("hidden");
                     return;
                 }
 
                 // Show loader and placeholder while fetching
-                document.getElementById("loaderIcon").classList.remove('hidden');
-                document.getElementById("generationIcon").classList.add('hidden');
+                document.getElementById("loaderIcon").classList.remove("hidden");
+                document.getElementById("generationIcon").classList.add("hidden");
                 document.getElementById("generationTime").textContent = "";
                 previewContainer.classList.add("text-text-muted");
-                previewPlaceholder.classList.remove('hidden');
-                previewLink.classList.add('hidden');
+                previewPlaceholder.classList.remove("hidden");
+                previewLink.classList.add("hidden");
 
                 // Build URL with customization parameters
                 let url;
@@ -528,14 +544,14 @@
                     }
 
                     const queryString = urlParams.toString();
-                    url = `${window.location.origin}/${type}/${identifierValue}${queryString ? '?' + queryString : ''}`;
+                    url = `${window.location.origin}/${type}/${identifierValue}${queryString ? "?" + queryString : ""}`;
                 } else {
                     const badgeParams = new URLSearchParams();
                     if (selectedColor !== "1bd96a") {
                         badgeParams.set("color", selectedColor);
                     }
                     const badgeQuery = badgeParams.toString();
-                    url = `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? '?' + badgeQuery : ''}`;
+                    url = `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
                 }
 
                 const modrinthUrl = `https://modrinth.com/${type}/${identifierValue}`;
@@ -551,19 +567,19 @@
                 copyMarkdownBtn.disabled = false;
                 copyHtmlBtn.disabled = false;
 
-                previewImg.src = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+                previewImg.src = `${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`;
                 previewImg.onload = async () => {
                     const endTime = performance.now();
                     const generationTime = Math.round(endTime - startTime);
                     document.getElementById("generationTime").textContent = `${generationTime}ms`;
-                    document.getElementById("generationIcon").classList.remove('hidden');
-                    document.getElementById("loaderIcon").classList.add('hidden');
+                    document.getElementById("generationIcon").classList.remove("hidden");
+                    document.getElementById("loaderIcon").classList.add("hidden");
 
                     // Show image after load
                     previewLink.href = modrinthUrl;
                     previewContainer.classList.remove("text-text-muted");
-                    previewPlaceholder.classList.add('hidden');
-                    previewLink.classList.remove('hidden');
+                    previewPlaceholder.classList.add("hidden");
+                    previewLink.classList.remove("hidden");
 
                     try {
                         const res = await fetch(`/meta/${type}/${encodeURIComponent(identifierValue)}`);
@@ -578,12 +594,12 @@
                 };
 
                 previewImg.onerror = () => {
-                    document.getElementById("loaderIcon").classList.add('hidden');
-                    document.getElementById("generationIcon").classList.add('hidden');
+                    document.getElementById("loaderIcon").classList.add("hidden");
+                    document.getElementById("generationIcon").classList.add("hidden");
                     document.getElementById("generationTime").textContent = "";
                     previewContainer.classList.add("text-text-muted");
-                    previewPlaceholder.classList.remove('hidden');
-                    previewLink.classList.add('hidden');
+                    previewPlaceholder.classList.remove("hidden");
+                    previewLink.classList.add("hidden");
                 };
             }
 

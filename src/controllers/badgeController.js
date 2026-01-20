@@ -39,7 +39,7 @@ const DATA_FETCHERS = {
 const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
     try {
         const identifier = req.params.username || req.params.slug || req.params.id;
-        const color = req.query.color ? `#${req.query.color.replace(/^#/, '')}` : "#1bd96a";
+        const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : "#1bd96a";
         const config = BADGE_CONFIGS[entityType][badgeType];
         const cacheKey = `badge:${config.label}:${identifier}:${color}`;
 
