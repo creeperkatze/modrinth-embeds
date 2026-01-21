@@ -1,5 +1,6 @@
 import { generateBadge } from "../generators/badge.js";
 import { generateAttribution, generateInfo } from "../generators/svgComponents.js";
+import { generatePng } from "../utils/generateImage.js";
 
 function generateErrorCard(message, detailText = "")
 {
@@ -62,9 +63,10 @@ function getStatusMessage(statusCode)
     return statusMessages[statusCode] || `Error ${statusCode}`;
 }
 
-export function errorHandler(err, req, res, next)
+export async function errorHandler(err, req, res, next)
 {
     const theme = req.query.theme || "dark";
+    const format = req.query.format;
 
     let statusCode = 500;
     let message = "Internal Server Error";
@@ -100,15 +102,28 @@ export function errorHandler(err, req, res, next)
     // Check if this is a badge request
     const isBadge = req.path.includes("/badge");
 
-    // Return appropriate error SVG
-    res.setHeader("Content-Type", "image/svg+xml");
-    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    // Check if PNG format is requested or if it's a Discord bot
+    const isPngFormat = req.isDiscordBot || format === "png";
 
     if (isBadge)
     {
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
+    } else if (isPngFormat)
+    {
+        // Generate PNG for Discord bots or when format=png is requested
+        const svg = generateErrorCard(message, detailText);
+        const pngBuffer = await generatePng(svg);
+
+        res.setHeader("Content-Type", "image/png");
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.status(statusCode).send(pngBuffer);
     } else
     {
+        // Return SVG
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         res.status(statusCode).send(generateErrorCard(message, detailText));
     }
 }

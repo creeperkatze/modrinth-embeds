@@ -1,4 +1,3 @@
-import { URL } from "url";
 import modrinthClient from "../services/modrinthClient.js";
 import cache from "../utils/cache.js";
 import { generateUserCard } from "../generators/userCard.js";
@@ -6,8 +5,7 @@ import { generateProjectCard } from "../generators/projectCard.js";
 import { generateOrganizationCard } from "../generators/organizationCard.js";
 import { generateCollectionCard } from "../generators/collectionCard.js";
 import logger from "../utils/logger.js";
-import { generateDiscordEmbedHTML } from "../middleware/discordEmbed.js";
-import { generatePng } from "../utils/generatePng.js";
+import { generatePng } from "../utils/generateImage.js";
 
 const MAX_AGE = Math.floor(cache.ttl / 1000);
 
