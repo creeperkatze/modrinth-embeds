@@ -110,9 +110,16 @@
                 border-radius: 0.5rem;
                 cursor: pointer;
                 transition: all 0.2s;
+                flex-shrink: 0;
             }
             .color-btn-selected {
                 border-color: #fff !important;
+            }
+            #manualColorPickerContainer.color-btn {
+                width: 39px;
+                height: 39px;
+                padding: 0;
+                border-radius: 0.5rem;
             }
         </style>
     </head>
@@ -229,7 +236,18 @@
 
                             <div class="mb-2">
                                 <h3 class="text-text-secondary text-base font-semibold mb-1">Accent Color</h3>
-                                <div id="colorButtons" class="flex flex-wrap gap-2"></div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div id="colorButtons" class="flex flex-wrap gap-2"></div>
+
+                                    <div id="manualColorPickerContainer" class="color-btn relative flex items-center justify-center bg-input-bg overflow-hidden border-2 border-border-dark">
+                                        <input type="color" id="manualColorPicker" value="#1bd96a" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none text-text-secondary">
+                                            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                            <path d="m15 5 4 4" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -345,6 +363,8 @@
             const maxVersionsValue = document.getElementById("maxVersionsValue");
             const relativeTime = document.getElementById("relativeTime");
             const colorButtons = document.getElementById("colorButtons");
+            const manualColorPicker = document.getElementById("manualColorPicker");
+            const manualColorPickerContainer = document.getElementById("manualColorPickerContainer");
             const showProjectsSection = document.getElementById("showProjectsSection");
             const maxProjectsSection = document.getElementById("maxProjectsSection");
             const showVersionsSection = document.getElementById("showVersionsSection");
@@ -397,7 +417,7 @@
 
             // Create color buttons
             const defaultColor = "1bd96a";
-            const hues = [0, 30, 60, 90, 150, 180, 210, 240, 270, 330];
+            const hues = [0, 30, 60, 150, 180, 210, 240, 270, 330];
             const colors = [defaultColor, ...hues.map((h) => hslToHex(h))];
 
             function createColorButton(color, container) {
@@ -407,10 +427,15 @@
                 btn.dataset.color = color;
                 btn.onclick = () => {
                     selectedColor = color;
-                    // Update all color buttons
+                    manualColorPicker.value = `#${color}`;
+
+                    manualColorPickerContainer.style.background = `#${color}`;
+                    manualColorPickerContainer.classList.remove("color-btn-selected");
+
                     document.querySelectorAll("[data-color]").forEach((b) => {
                         b.classList.toggle("color-btn-selected", b.dataset.color === selectedColor);
                     });
+
                     generate();
                     updateUrl();
                 };
@@ -445,6 +470,22 @@
                 customizationChevron.classList.toggle("rotate-180", customizationExpanded);
             });
 
+            manualColorPicker.addEventListener("input", (e) => {
+                selectedColor = e.target.value.substring(1);
+
+                manualColorPickerContainer.style.background = `#${selectedColor}`;
+
+                // deselect all preset buttons
+                document.querySelectorAll("[data-color]").forEach((b) => {
+                    b.classList.remove("color-btn-selected");
+                });
+
+                // select manual picker
+                manualColorPickerContainer.classList.add("color-btn-selected");
+
+                generate();
+                updateUrl();
+            });
             // URL state management functions
             function getUrlParams() {
                 const params = new URLSearchParams(window.location.search);
@@ -490,22 +531,39 @@
 
             function loadFromUrl() {
                 const params = getUrlParams();
+
                 embedType.value = params.type;
                 targetType.value = params.target;
                 badgeMetric.value = params.metric;
                 identifier.value = params.value;
+
                 showProjects.checked = params.showProjects;
                 maxProjects.value = params.maxProjects;
                 maxProjectsValue.textContent = params.maxProjects;
+
                 showVersions.checked = params.showVersions;
                 maxVersions.value = params.maxVersions;
                 maxVersionsValue.textContent = params.maxVersions;
+
                 relativeTime.checked = params.relativeTime;
                 selectedColor = params.color;
-                // Update all color button selections
+
+                const isPresetColor = colors.includes(selectedColor);
+
+                manualColorPicker.value = `#${selectedColor}`;
+                manualColorPickerContainer.style.background = `#${selectedColor}`;
+
+                manualColorPickerContainer.classList.toggle("color-btn-selected", !isPresetColor);
+
                 document.querySelectorAll("[data-color]").forEach((b) => {
                     b.classList.toggle("color-btn-selected", b.dataset.color === selectedColor);
                 });
+
+                if (hasCustomizationFromUrl(params)) {
+                    customizationExpanded = true;
+                    customizationContent.classList.remove("hidden");
+                    customizationChevron.classList.add("rotate-180");
+                }
             }
 
             function parseModrinthUrl(url) {
@@ -783,6 +841,10 @@
                         span.textContent = originalText;
                     }, 2000);
                 });
+            }
+
+            function hasCustomizationFromUrl(params) {
+                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.color !== "1bd96a";
             }
 
             loadFromUrl();
