@@ -9,6 +9,7 @@ import organizationRoutes from "./routes/organizationRoutes.js";
 import collectionRoutes from "./routes/collectionRoutes.js";
 import metaRoutes from "./routes/metaRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { discordEmbedMiddleware } from "./middleware/discordEmbed.js";
 
 dotenv.config({ quiet: true });
 
@@ -19,6 +20,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.static(path.join(dirname, "..", "public")));
+
+app.use(discordEmbedMiddleware);
 
 app.use("/", userRoutes, projectRoutes, organizationRoutes, collectionRoutes, metaRoutes);
 

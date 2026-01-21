@@ -5,6 +5,7 @@ import { generateProjectCard } from "../generators/projectCard.js";
 import { generateOrganizationCard } from "../generators/organizationCard.js";
 import { generateCollectionCard } from "../generators/collectionCard.js";
 import logger from "../utils/logger.js";
+import { generateDiscordEmbedHTML } from "../middleware/discordEmbed.js";
 
 const MAX_AGE = Math.floor(cache.ttl / 1000);
 
@@ -48,6 +49,21 @@ const handleCardRequest = async (req, res, next, cardType) => {
         };
 
         const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;
+
+        // If Discord bot, serve HTML with Open Graph meta tags
+        if (req.isDiscordBot) {
+            const protocol = req.protocol;
+            const host = req.get("host");
+            const imageUrl = `${protocol}://${host}${req.originalUrl}`;
+
+            const title = `${identifier} - Modrinth ${cardType.charAt(0).toUpperCase() + cardType.slice(1)}`;
+            const html = generateDiscordEmbedHTML(title, imageUrl);
+
+            logger.info(`Showing ${cardType} card for "${identifier}" (Discord embed)`);
+            res.setHeader("Content-Type", "text/html");
+            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
+            return res.send(html);
+        }
 
         const cached = cache.get(cacheKey);
         if (cached) {
