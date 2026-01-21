@@ -1,15 +1,17 @@
 import path from "path";
 import { Resvg } from "@resvg/resvg-js";
 import { readFileSync } from "fs";
-import logger from "./logger.js";
+import { fileURLToPath } from "url";
 
-// Load Inter font from public/fonts
-const fontPath = path.join(process.cwd(), "public", "fonts", "inter.ttf");
-const fontBuffer = readFileSync(fontPath);
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function generatePng(svgString)
 {
-    logger.info(fontPath);
+    // Load font from a path relative to this file
+    const fontPath = path.join(__dirname, "..", "..", "public", "fonts", "inter.ttf");
+    const fontBuffer = readFileSync(fontPath);
 
     const options = {
         fitTo: {
