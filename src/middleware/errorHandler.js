@@ -103,14 +103,14 @@ export async function errorHandler(err, req, res, next)
     const isBadge = req.path.includes("/badge");
 
     // Check if PNG format is requested or if it's a Discord bot
-    const isPngFormat = req.isDiscordBot || format === "png";
+    const useImage = req.isCrawler || format === "png";
 
     if (isBadge)
     {
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         res.status(statusCode).send(generateBadge("error", message, "#f38ba8"));
-    } else if (isPngFormat)
+    } else if (useImage)
     {
         // Generate PNG for Discord bots or when format=png is requested
         const svg = generateErrorCard(message, detailText);

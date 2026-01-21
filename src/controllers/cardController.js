@@ -52,7 +52,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;
 
         // Generate PNG for Discord bots or when format=png is requested
-        if (req.isDiscordBot || format === "png") {
+        if (req.isCrawler || format === "png") {
             const pngCacheKey = `${cacheKey}:png`;
             const cachedPng = cache.get(pngCacheKey);
 
