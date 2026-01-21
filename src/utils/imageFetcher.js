@@ -1,6 +1,7 @@
 import logger from "./logger.js";
 import { pLimit, requestDeduplicator } from "./asyncUtils.js";
 import sharp from "sharp";
+import { fileTypeFromBuffer } from "file-type";
 
 const USER_AGENT = process.env.USER_AGENT;
 const MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || "10", 10);
@@ -20,12 +21,17 @@ export async function fetchImageAsBase64(url)
 
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-            const contentType = response.headers.get("content-type") || "image/png";
+
+            // Use file-type library for bulletproof file type detection
+            const detectedType = await fileTypeFromBuffer(buffer);
 
             // Convert to PNG if needed for Resvg compatibility
             // Resvg doesn't support WebP embedded in SVG
             let pngBuffer = buffer;
-            if (contentType.includes("webp") || contentType.includes("svg")) {
+            const needsConversion = detectedType?.mime === "image/webp" || detectedType?.mime === "image/svg+xml";
+
+            if (needsConversion) {
+                logger.info(`Converting ${detectedType?.mime || "unknown"} image to PNG: ${url}`);
                 pngBuffer = await sharp(buffer).png().toBuffer();
             }
 
