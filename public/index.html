@@ -28,6 +28,7 @@
                             "text-muted": "#929aa3",
                             "text-bright": "#ecf9fb",
                             yellow: "#fbbf24",
+                            red: "#ef4444",
                         },
                     },
                 },
@@ -289,6 +290,16 @@
                                     <path d="M12 17h.01" />
                                 </svg>
                                 <span>The Modrinth API is responding slowly. Embeds may take longer to load.</span>
+                            </span>
+                        </div>
+                        <div id="apiErrorWarning" class="hidden mb-3 bg-red/10 border border-red/30 rounded-lg px-3 py-2 text-sm text-red">
+                            <span class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-octagon-alert-icon lucide-octagon-alert">
+                                    <path d="M12 16h.01"/>
+                                    <path d="M12 8v4"/>
+                                    <path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"/>
+                                </svg>
+                                <span>The Modrinth API is currently down. Please try again later.</span>
                             </span>
                         </div>
                         <div class="bg-section-bg border border-border-dark rounded-xl min-h-[460px] flex items-center justify-center text-text-muted p-4" id="previewContainer">
@@ -784,6 +795,7 @@
                     document.getElementById("generationIcon").classList.add("hidden");
                     document.getElementById("loaderIcon").classList.add("hidden");
                     document.getElementById("apiSlowWarning").classList.add("hidden");
+                    document.getElementById("apiErrorWarning").classList.add("hidden");
                     return;
                 }
 
@@ -792,6 +804,7 @@
                 document.getElementById("generationIcon").classList.add("hidden");
                 document.getElementById("generationTime").textContent = "";
                 document.getElementById("apiSlowWarning").classList.add("hidden");
+                document.getElementById("apiErrorWarning").classList.add("hidden");
                 previewContainer.classList.add("text-text-muted");
                 previewPlaceholder.classList.remove("hidden");
                 previewLink.classList.add("hidden");
@@ -862,9 +875,25 @@
                     document.getElementById("generationIcon").classList.remove("hidden");
                     document.getElementById("loaderIcon").classList.add("hidden");
 
+                    // Check for API errors by looking at response headers
+                    try {
+                        const res = await fetch(url, { method: 'HEAD' });
+                        const errorStatus = res.headers.get("X-Error-Status");
+
+                        if (errorStatus && (errorStatus.startsWith('5') || errorStatus === '502' || errorStatus === '503' || errorStatus === '504')) {
+                            document.getElementById("apiErrorWarning").classList.remove("hidden");
+                        } else {
+                            document.getElementById("apiErrorWarning").classList.add("hidden");
+                        }
+                    } catch {
+                        document.getElementById("apiErrorWarning").classList.add("hidden");
+                    }
+
                     // Show slow API warning if generation time is too long
                     if (generationTime > 1000) {
                         document.getElementById("apiSlowWarning").classList.remove("hidden");
+                    } else {
+                        document.getElementById("apiSlowWarning").classList.add("hidden");
                     }
 
                     // Show image after load
@@ -890,6 +919,21 @@
                     document.getElementById("generationIcon").classList.add("hidden");
                     document.getElementById("generationTime").textContent = "";
                     document.getElementById("apiSlowWarning").classList.add("hidden");
+
+                    // Check if this is an API error by attempting to fetch the image status
+                    fetch(url, { method: 'HEAD' })
+                        .then(res => {
+                            const errorStatus = res.headers.get("X-Error-Status");
+                            if (errorStatus && (errorStatus.startsWith('5') || errorStatus === '502' || errorStatus === '503' || errorStatus === '504')) {
+                                document.getElementById("apiErrorWarning").classList.remove("hidden");
+                            } else {
+                                document.getElementById("apiErrorWarning").classList.add("hidden");
+                            }
+                        })
+                        .catch(() => {
+                            document.getElementById("apiErrorWarning").classList.add("hidden");
+                        });
+
                     previewContainer.classList.add("text-text-muted");
                     previewPlaceholder.classList.remove("hidden");
                     previewLink.classList.add("hidden");
