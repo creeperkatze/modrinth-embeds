@@ -27,16 +27,18 @@ export async function fetchImageAsBase64(url, convertToPng = false)
 
             let finalBuffer = buffer;
             let mimeType = detectedType?.mime || "image/png";
+            let conversionTime = 0;
 
             // Only convert to PNG if specifically requested
             if (convertToPng && detectedType?.mime !== "image/png") {
-                logger.info(`Converting ${detectedType?.mime || "unknown"} image to png for rendering: ${url}`);
+                const startTime = performance.now();
                 finalBuffer = await sharp(buffer).png().toBuffer();
+                conversionTime = performance.now() - startTime;
                 mimeType = "image/png";
             }
 
             const base64 = finalBuffer.toString("base64");
-            return `data:${mimeType};base64,${base64}`;
+            return { data: `data:${mimeType};base64,${base64}`, conversionTime };
         } catch (error)
         {
             logger.warn(`Failed to fetch image ${url}: ${error.message}`);
@@ -47,14 +49,19 @@ export async function fetchImageAsBase64(url, convertToPng = false)
 
 export async function fetchImagesForProjects(projects, convertToPng = false)
 {
+    let totalConversionTime = 0;
+
     // Use concurrency limiting to prevent overwhelming the API
     const tasks = projects
         .filter(project => project.icon_url)
         .map(project => async () => {
-            project.icon_url_base64 = await fetchImageAsBase64(project.icon_url, convertToPng);
+            const result = await fetchImageAsBase64(project.icon_url, convertToPng);
+            project.icon_url_base64 = result?.data;
+            if (result?.conversionTime) totalConversionTime += result.conversionTime;
         });
 
     await pLimit(tasks, MAX_CONCURRENT_REQUESTS);
+    return totalConversionTime;
 }
 
 export async function fetchVersionDatesForProjects(projects, getVersionsFunc)

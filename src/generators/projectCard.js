@@ -22,6 +22,7 @@ export function generateProjectCard(data, theme = "dark", options = {})
     const {
         showVersions = true,
         maxVersions = DEFAULT_VERSIONS_COUNT,
+        showSparklines = true,
         color = null,
         backgroundColor = null
     } = options;
@@ -42,7 +43,7 @@ export function generateProjectCard(data, theme = "dark", options = {})
     ];
 
     const content = `
-${generateActivitySparkline(versionDates, colors)}
+${showSparklines ? generateActivitySparkline(versionDates, colors) : ""}
 
   <!-- Modrinth Icon -->
   <svg x="15" y="15" width="24" height="24" viewBox="0 0 512 514">

@@ -20,6 +20,7 @@ export function generateCollectionCard(data, theme = "dark", options = {})
     const {
         showProjects = true,
         maxProjects = DEFAULT_PROJECTS_COUNT,
+        showSparklines = true,
         color = null,
         backgroundColor = null
     } = options;
@@ -37,12 +38,12 @@ export function generateCollectionCard(data, theme = "dark", options = {})
     ];
 
     const content = `
-${generateActivitySparkline(stats.allVersionDates || [], colors)}
+${showSparklines ? generateActivitySparkline(stats.allVersionDates || [], colors) : ""}
 ${generateHeader("collection", "collection", collection.name, colors)}
 ${generateProfileImage(collection.icon_url_base64, "collection-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
-${generateProjectList(topProjects, "Projects", colors)}
+${generateProjectList(topProjects, "Projects", colors, showSparklines)}
 ${generateInfo(height, colors)}
 ${generateAttribution(height, colors)}
 `;

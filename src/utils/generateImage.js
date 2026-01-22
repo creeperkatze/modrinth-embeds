@@ -11,6 +11,8 @@ const fontFiles = readdirSync(fontsDir)
 
 export async function generatePng(svgString)
 {
+    const startTime = performance.now();
+
     const options = {
         fitTo: {
             mode: "width",
@@ -27,5 +29,7 @@ export async function generatePng(svgString)
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
 
-    return pngBuffer;
+    const renderTime = performance.now() - startTime;
+
+    return { buffer: pngBuffer, renderTime };
 }

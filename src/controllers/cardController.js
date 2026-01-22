@@ -49,6 +49,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
             maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 50),
             maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 50),
             relativeTime: req.query.relativeTime !== "false",
+            showSparklines: req.query.showSparklines !== "false",
             color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null,
             backgroundColor: req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null
         };
@@ -70,13 +71,17 @@ const handleCardRequest = async (req, res, next, cardType) => {
             // Generate new SVG with PNG-converted images, then render to PNG
             const data = await config.dataFetcher(modrinthClient, identifier, options, true);
             const svg = config.generator(data, theme, options);
-            const pngBuffer = await generatePng(svg);
+            const { buffer: pngBuffer, renderTime } = await generatePng(svg);
 
             // Cache both SVG and PNG
             cache.set(cacheKey, svg);
             cache.set(pngCacheKey, pngBuffer);
 
-            logger.info(`Showing ${cardType} card for "${identifier}" (image)`);
+            const apiTime = data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A";
+            const conversionTime = data.timings?.imageConversion ? `${Math.round(data.timings.imageConversion)}ms` : "N/A";
+            const pngTime = `${Math.round(renderTime)}ms`;
+
+            logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime}, image conversion: ${conversionTime}, render: ${pngTime})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
             return res.send(pngBuffer);
@@ -97,7 +102,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
         cache.set(cacheKey, svg);
 
-        logger.info(`Showing ${cardType} card for "${identifier}"`);
+        const apiTime = data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A";
+        logger.info(`Showing ${cardType} card for "${identifier}" (api: ${apiTime})`);
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
         res.send(svg);

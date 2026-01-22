@@ -88,23 +88,28 @@ export class ModrinthClient
 
     async getUserStats(username, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
+        const apiStart = performance.now();
+
         const [user, projects] = await Promise.all([
             this.getUser(username),
             this.getUserProjects(username)
         ]);
 
+        const apiTime = performance.now() - apiStart;
+
         // Use combined aggregation for single-pass efficiency
         const stats = aggregateAllStats(projects, maxProjects);
         const topProjects = stats.topProjects;
 
-        // Always fetch images, but only convert to PNG if rendering to PNG
-        await Promise.all([
-            fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this)),
-            fetchImagesForProjects(topProjects, convertToPng),
-            user.avatar_url ? fetchImageAsBase64(user.avatar_url, convertToPng).then(base64 => {
-                user.avatar_url_base64 = base64;
-            }) : Promise.resolve()
-        ]);
+        let imageConversionTime = 0;
+        const avatarResult = user.avatar_url ? await fetchImageAsBase64(user.avatar_url, convertToPng) : null;
+        user.avatar_url_base64 = avatarResult?.data;
+        if (avatarResult?.conversionTime) imageConversionTime += avatarResult.conversionTime;
+
+        const projectsConversionTime = await fetchImagesForProjects(topProjects, convertToPng);
+        imageConversionTime += projectsConversionTime;
+
+        await fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this));
 
         const allVersionDates = topProjects.flatMap(p => p.versionDates || []);
 
@@ -114,20 +119,30 @@ export class ModrinthClient
             stats: {
                 ...stats,
                 allVersionDates
+            },
+            timings: {
+                api: apiTime,
+                imageConversion: imageConversionTime
             }
         };
     }
 
     async getProjectStats(slug, maxVersions = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
+        const apiStart = performance.now();
+
         const [project, versions] = await Promise.all([
             this.getProject(slug),
             this.getProjectVersions(slug)
         ]);
 
-        // Always fetch images, but only convert to PNG if rendering to PNG
+        const apiTime = performance.now() - apiStart;
+
+        let imageConversionTime = 0;
         if (project.icon_url) {
-            project.icon_url_base64 = await fetchImageAsBase64(project.icon_url, convertToPng);
+            const result = await fetchImageAsBase64(project.icon_url, convertToPng);
+            project.icon_url_base64 = result?.data;
+            if (result?.conversionTime) imageConversionTime += result.conversionTime;
         }
 
         const latestVersions = [...versions]
@@ -141,16 +156,24 @@ export class ModrinthClient
                 downloads: project.downloads || 0,
                 followers: project.followers || 0,
                 versionCount: versions.length
+            },
+            timings: {
+                api: apiTime,
+                imageConversion: imageConversionTime
             }
         };
     }
 
     async getOrganizationStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
+        const apiStart = performance.now();
+
         const [organization, rawProjects] = await Promise.all([
             this.getOrganization(id),
             this.getOrganizationProjects(id)
         ]);
+
+        const apiTime = performance.now() - apiStart;
 
         const projects = normalizeV3ProjectFields(rawProjects);
 
@@ -158,14 +181,15 @@ export class ModrinthClient
         const stats = aggregateAllStats(projects, maxProjects);
         const topProjects = stats.topProjects;
 
-        // Always fetch images, but only convert to PNG if rendering to PNG
-        await Promise.all([
-            fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this)),
-            fetchImagesForProjects(topProjects, convertToPng),
-            organization.icon_url ? fetchImageAsBase64(organization.icon_url, convertToPng).then(base64 => {
-                organization.icon_url_base64 = base64;
-            }) : Promise.resolve()
-        ]);
+        let imageConversionTime = 0;
+        const orgIconResult = organization.icon_url ? await fetchImageAsBase64(organization.icon_url, convertToPng) : null;
+        organization.icon_url_base64 = orgIconResult?.data;
+        if (orgIconResult?.conversionTime) imageConversionTime += orgIconResult.conversionTime;
+
+        const projectsConversionTime = await fetchImagesForProjects(topProjects, convertToPng);
+        imageConversionTime += projectsConversionTime;
+
+        await fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this));
 
         const allVersionDates = topProjects.flatMap(p => p.versionDates || []);
 
@@ -175,29 +199,38 @@ export class ModrinthClient
             stats: {
                 ...stats,
                 allVersionDates
+            },
+            timings: {
+                api: apiTime,
+                imageConversion: imageConversionTime
             }
         };
     }
 
     async getCollectionStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
+        const apiStart = performance.now();
+
         const collection = await this.getCollection(id);
 
         const projects = collection.projects && collection.projects.length > 0
             ? await this.getProjects(collection.projects)
             : [];
 
+        const apiTime = performance.now() - apiStart;
+
         // Use optimized aggregation - only basic stats needed for collections
         const { totalDownloads, totalFollowers, projectCount, topProjects } = aggregateProjectStats(projects, maxProjects);
 
-        // Always fetch images, but only convert to PNG if rendering to PNG
-        await Promise.all([
-            fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this)),
-            fetchImagesForProjects(topProjects, convertToPng),
-            collection.icon_url ? fetchImageAsBase64(collection.icon_url, convertToPng).then(base64 => {
-                collection.icon_url_base64 = base64;
-            }) : Promise.resolve()
-        ]);
+        let imageConversionTime = 0;
+        const collectionIconResult = collection.icon_url ? await fetchImageAsBase64(collection.icon_url, convertToPng) : null;
+        collection.icon_url_base64 = collectionIconResult?.data;
+        if (collectionIconResult?.conversionTime) imageConversionTime += collectionIconResult.conversionTime;
+
+        const projectsConversionTime = await fetchImagesForProjects(topProjects, convertToPng);
+        imageConversionTime += projectsConversionTime;
+
+        await fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this));
 
         const allVersionDates = topProjects.flatMap(p => p.versionDates || []);
 
@@ -210,6 +243,10 @@ export class ModrinthClient
                 projectCount,
                 topProjects,
                 allVersionDates
+            },
+            timings: {
+                api: apiTime,
+                imageConversion: imageConversionTime
             }
         };
     }

@@ -236,6 +236,13 @@
                             </div>
 
                             <div class="mb-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="showSparklines" checked class="!w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0 checked:bg-modrinth-green checked:border-modrinth-green" />
+                                    <span class="text-base text-text-secondary">Sparkline Graphs</span>
+                                </label>
+                            </div>
+
+                            <div class="mb-2">
                                 <h3 class="text-text-secondary text-base font-semibold mb-1">Accent Color</h3>
                                 <div class="flex flex-wrap items-center gap-2">
                                     <div id="colorButtons" class="flex flex-wrap gap-2"></div>
@@ -410,6 +417,7 @@
             const showVersionsSection = document.getElementById("showVersionsSection");
             const maxVersionsSection = document.getElementById("maxVersionsSection");
             const relativeTimeSection = document.getElementById("relativeTimeSection");
+            const showSparklines = document.getElementById("showSparklines");
 
             let selectedColor = "1bd96a";
             let selectedBgColor = null;
@@ -610,6 +618,7 @@
                     showVersions: params.get("showVersions") !== "false",
                     maxVersions: parseInt(params.get("maxVersions")) || 5,
                     relativeTime: params.get("relativeTime") !== "false",
+                    showSparklines: params.get("showSparklines") !== "false",
                     color: params.get("color") || "1bd96a",
                     backgroundColor: params.get("backgroundColor") || null,
                 };
@@ -634,6 +643,7 @@
                     if (!showVersions.checked) params.set("showVersions", "false");
                     if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
                     if (!relativeTime.checked) params.set("relativeTime", "false");
+                    if (!showSparklines.checked) params.set("showSparklines", "false");
                     if (selectedColor !== "1bd96a") params.set("color", selectedColor);
                     if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
                 } else {
@@ -662,6 +672,7 @@
                 maxVersionsValue.textContent = params.maxVersions;
 
                 relativeTime.checked = params.relativeTime;
+                showSparklines.checked = params.showSparklines;
                 selectedColor = params.color;
                 selectedBgColor = params.backgroundColor;
 
@@ -828,6 +839,9 @@
                     if (!relativeTime.checked && type === "project") {
                         urlParams.set("relativeTime", "false");
                     }
+                    if (!showSparklines.checked) {
+                        urlParams.set("showSparklines", "false");
+                    }
                     if (selectedColor !== "1bd96a") {
                         urlParams.set("color", selectedColor);
                     }
@@ -978,6 +992,10 @@
                 generate();
                 updateUrl();
             });
+            showSparklines.addEventListener("change", () => {
+                generate();
+                updateUrl();
+            });
 
             function copyMarkdown() {
                 const text = markdownOutput.textContent.trim();
@@ -1022,7 +1040,7 @@
             }
 
             function hasCustomizationFromUrl(params) {
-                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.color !== "1bd96a" || params.backgroundColor !== null;
+                return params.showProjects === false || params.maxProjects !== 5 || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.showSparklines === false || params.color !== "1bd96a" || params.backgroundColor !== null;
             }
 
             loadFromUrl();

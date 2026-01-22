@@ -20,6 +20,7 @@ export function generateOrganizationCard(data, theme = "dark", options = {})
     const {
         showProjects = true,
         maxProjects = DEFAULT_PROJECTS_COUNT,
+        showSparklines = true,
         color = null,
         backgroundColor = null
     } = options;
@@ -37,12 +38,12 @@ export function generateOrganizationCard(data, theme = "dark", options = {})
     ];
 
     const content = `
-${generateActivitySparkline(stats.allVersionDates || [], colors)}
+${showSparklines ? generateActivitySparkline(stats.allVersionDates || [], colors) : ""}
 ${generateHeader("organization", "building", organization.name, colors)}
 ${generateProfileImage(organization.icon_url_base64, "org-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
 ${generateDivider(colors)}
-${generateProjectList(topProjects, "Top Projects", colors)}
+${generateProjectList(topProjects, "Top Projects", colors, showSparklines)}
 ${generateInfo(height, colors)}
 ${generateAttribution(height, colors)}
 `;

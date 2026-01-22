@@ -126,7 +126,7 @@ export function generateStatsGrid(stats, colors)
   </g>`).join("");
 }
 
-export function generateProjectListItem(project, index, totalDownloads, colors)
+export function generateProjectListItem(project, index, totalDownloads, colors, showSparklines = true)
 {
     const yPos = 160 + (index * 50);
     const projectName = escapeXml(truncateText(project.title, 18));
@@ -171,7 +171,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
     </defs>
     <rect x="15" y="${yPos - 18}" width="420" height="40" fill="none" stroke="${colors.borderColor}" stroke-width="1" rx="6" vector-effect="non-scaling-stroke"/>
 
-    <!-- Project version activity sparkline (centered) -->
+${showSparklines ? `    <!-- Project version activity sparkline (centered) -->
     <g clip-path="url(#project-clip-${index})">
       <g transform="translate(${sparklineXOffset}, ${yPos - 88})">
         <path
@@ -189,7 +189,7 @@ export function generateProjectListItem(project, index, totalDownloads, colors)
           opacity="0.05"
         />
       </g>
-    </g>
+    </g>` : ""}
 
     <!-- Relative downloads bar -->
     <rect x="15" y="${yPos - 17.5}" width="${barWidth}" height="3" fill="${colors.accentColor}" clip-path="url(#project-clip-${index})"/>
@@ -234,13 +234,13 @@ export function generateDivider(colors)
   <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
 }
 
-export function generateProjectList(topProjects, sectionTitle, colors)
+export function generateProjectList(topProjects, sectionTitle, colors, showSparklines = true)
 {
     if (!topProjects || topProjects.length === 0) return "";
 
     const totalDownloads = topProjects.reduce((sum, p) => sum + p.downloads, 0);
     const projectsHtml = topProjects.map((project, index) =>
-        generateProjectListItem(project, index, totalDownloads, colors)
+        generateProjectListItem(project, index, totalDownloads, colors, showSparklines)
     ).join("");
 
     return `
