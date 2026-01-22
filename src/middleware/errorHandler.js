@@ -101,8 +101,8 @@ export async function errorHandler(err, req, res, next)
     // Check if this is a badge request
     const isBadge = req.path.includes("/badge");
 
-    // Check if PNG format is requested or if it's a Discord bot
-    const useImage = req.isCrawler || format === "png";
+    // Check if image format is requested or if it's a Discord bot
+    const useImage = req.isCrawler || format === "image";
 
     if (isBadge)
     {

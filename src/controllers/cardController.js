@@ -12,22 +12,22 @@ const MAX_AGE = Math.floor(cache.ttl / 1000);
 const CARD_CONFIGS = {
     user: {
         paramKey: "username",
-        dataFetcher: (client, id, options) => client.getUserStats(id, options.maxProjects),
+        dataFetcher: (client, id, options, convertToPng) => client.getUserStats(id, options.maxProjects, convertToPng),
         generator: generateUserCard
     },
     project: {
         paramKey: "slug",
-        dataFetcher: (client, id, options) => client.getProjectStats(id, options.maxVersions, options.showVersions),
+        dataFetcher: (client, id, options, convertToPng) => client.getProjectStats(id, options.maxVersions, convertToPng),
         generator: generateProjectCard
     },
     organization: {
         paramKey: "id",
-        dataFetcher: (client, id, options) => client.getOrganizationStats(id, options.maxProjects),
+        dataFetcher: (client, id, options, convertToPng) => client.getOrganizationStats(id, options.maxProjects, convertToPng),
         generator: generateOrganizationCard
     },
     collection: {
         paramKey: "id",
-        dataFetcher: (client, id, options) => client.getCollectionStats(id, options.maxProjects),
+        dataFetcher: (client, id, options, convertToPng) => client.getCollectionStats(id, options.maxProjects, convertToPng),
         generator: generateCollectionCard
     }
 };
@@ -38,6 +38,9 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const identifier = req.params[config.paramKey];
         const theme = req.query.theme || "dark";
         const format = req.query.format;
+
+        // Determine if we need to fetch images (only for PNG generation)
+        const needsImages = req.isCrawler || format === "image";
 
         // Parse customization options
         const options = {
@@ -52,8 +55,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
 
         const cacheKey = `${cardType}:${identifier}:${theme}:${JSON.stringify(options)}`;
 
-        // Generate PNG for Discord bots or when format=png is requested
-        if (req.isCrawler || format === "png") {
+        // Generate PNG for Discord bots or when format=image is requested
+        if (needsImages) {
             const pngCacheKey = `${cacheKey}:png`;
             const cachedPng = cache.get(pngCacheKey);
 
@@ -64,14 +67,14 @@ const handleCardRequest = async (req, res, next, cardType) => {
                 return res.send(cachedPng);
             }
 
-            // Generate PNG from cached SVG or generate new one
-            const svg = cache.get(cacheKey) || await (async () => {
-                const data = await config.dataFetcher(modrinthClient, identifier, options);
-                const generatedSvg = config.generator(data, theme, options);
-                cache.set(cacheKey, generatedSvg);
-                return generatedSvg;
-            })();
+            // Generate new SVG with PNG-converted images, then render to PNG
+            const data = await config.dataFetcher(modrinthClient, identifier, options, true);
+            const svg = config.generator(data, theme, options);
             const pngBuffer = await generatePng(svg);
+
+            // Cache both SVG and PNG
+            cache.set(cacheKey, svg);
+            cache.set(pngCacheKey, pngBuffer);
 
             logger.info(`Showing ${cardType} card for "${identifier}" (image)`);
             res.setHeader("Content-Type", "image/png");
@@ -88,7 +91,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
             return res.send(cached);
         }
 
-        const data = await config.dataFetcher(modrinthClient, identifier, options);
+        // Generate fresh SVG without converting images (WebP/GIF/etc. are fine in SVG)
+        const data = await config.dataFetcher(modrinthClient, identifier, options, false);
         const svg = config.generator(data, theme, options);
 
         cache.set(cacheKey, svg);

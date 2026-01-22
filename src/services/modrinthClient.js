@@ -87,7 +87,7 @@ export class ModrinthClient
         return this.fetch(`${MODRINTH_API_URL}/projects?ids=${encodeURIComponent(idsParam)}`);
     }
 
-    async getUserStats(username, maxProjects = DEFAULT_TOP_PROJECTS_COUNT)
+    async getUserStats(username, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
         const [user, projects] = await Promise.all([
             this.getUser(username),
@@ -98,14 +98,16 @@ export class ModrinthClient
         const stats = aggregateAllStats(projects, maxProjects);
         const topProjects = stats.topProjects;
 
-        // Parallelize all async operations - only fetch data for top N projects
-        const [allVersionDates] = await Promise.all([
+        // Always fetch images, but only convert to PNG if rendering to PNG
+        await Promise.all([
             fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this)),
-            fetchImagesForProjects(topProjects),
-            user.avatar_url ? fetchImageAsBase64(user.avatar_url).then(base64 => {
+            fetchImagesForProjects(topProjects, convertToPng),
+            user.avatar_url ? fetchImageAsBase64(user.avatar_url, convertToPng).then(base64 => {
                 user.avatar_url_base64 = base64;
             }) : Promise.resolve()
         ]);
+
+        const allVersionDates = topProjects.flatMap(p => p.versionDates || []);
 
         return {
             user,
@@ -117,16 +119,16 @@ export class ModrinthClient
         };
     }
 
-    async getProjectStats(slug, maxVersions = DEFAULT_TOP_PROJECTS_COUNT)
+    async getProjectStats(slug, maxVersions = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
         const [project, versions] = await Promise.all([
             this.getProject(slug),
             this.getProjectVersions(slug)
         ]);
 
-        if (project.icon_url)
-        {
-            project.icon_url_base64 = await fetchImageAsBase64(project.icon_url);
+        // Always fetch images, but only convert to PNG if rendering to PNG
+        if (project.icon_url) {
+            project.icon_url_base64 = await fetchImageAsBase64(project.icon_url, convertToPng);
         }
 
         const latestVersions = [...versions]
@@ -144,7 +146,7 @@ export class ModrinthClient
         };
     }
 
-    async getOrganizationStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT)
+    async getOrganizationStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
         const [organization, rawProjects] = await Promise.all([
             this.getOrganization(id),
@@ -157,14 +159,16 @@ export class ModrinthClient
         const stats = aggregateAllStats(projects, maxProjects);
         const topProjects = stats.topProjects;
 
-        // Parallelize all async operations - only fetch data for top N projects
-        const [allVersionDates] = await Promise.all([
+        // Always fetch images, but only convert to PNG if rendering to PNG
+        await Promise.all([
             fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this)),
-            fetchImagesForProjects(topProjects),
-            organization.icon_url ? fetchImageAsBase64(organization.icon_url).then(base64 => {
+            fetchImagesForProjects(topProjects, convertToPng),
+            organization.icon_url ? fetchImageAsBase64(organization.icon_url, convertToPng).then(base64 => {
                 organization.icon_url_base64 = base64;
             }) : Promise.resolve()
         ]);
+
+        const allVersionDates = topProjects.flatMap(p => p.versionDates || []);
 
         return {
             organization,
@@ -176,7 +180,7 @@ export class ModrinthClient
         };
     }
 
-    async getCollectionStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT)
+    async getCollectionStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
     {
         const collection = await this.getCollection(id);
 
@@ -187,14 +191,16 @@ export class ModrinthClient
         // Use optimized aggregation - only basic stats needed for collections
         const { totalDownloads, totalFollowers, projectCount, topProjects } = aggregateProjectStats(projects, maxProjects);
 
-        // Parallelize all async operations - only fetch data for top N projects
-        const [allVersionDates] = await Promise.all([
+        // Always fetch images, but only convert to PNG if rendering to PNG
+        await Promise.all([
             fetchVersionDatesForProjects(topProjects, this.getProjectVersions.bind(this)),
-            fetchImagesForProjects(topProjects),
-            collection.icon_url ? fetchImageAsBase64(collection.icon_url).then(base64 => {
+            fetchImagesForProjects(topProjects, convertToPng),
+            collection.icon_url ? fetchImageAsBase64(collection.icon_url, convertToPng).then(base64 => {
                 collection.icon_url_base64 = base64;
             }) : Promise.resolve()
         ]);
+
+        const allVersionDates = topProjects.flatMap(p => p.versionDates || []);
 
         return {
             collection,

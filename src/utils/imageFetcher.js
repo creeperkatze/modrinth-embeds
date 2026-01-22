@@ -6,12 +6,12 @@ import { fileTypeFromBuffer } from "file-type";
 const USER_AGENT = process.env.USER_AGENT;
 const MAX_CONCURRENT_REQUESTS = parseInt(process.env.MAX_CONCURRENT_REQUESTS || "10", 10);
 
-export async function fetchImageAsBase64(url)
+export async function fetchImageAsBase64(url, convertToPng = false)
 {
     if (!url) return null;
 
     // Use request deduplication to prevent fetching the same image multiple times
-    return requestDeduplicator.dedupe(`image:${url}`, async () => {
+    return requestDeduplicator.dedupe(`image:${url}:${convertToPng}`, async () => {
         try
         {
             const response = await fetch(url, {
@@ -25,18 +25,18 @@ export async function fetchImageAsBase64(url)
             // Use file-type library for bulletproof file type detection
             const detectedType = await fileTypeFromBuffer(buffer);
 
-            // Convert to PNG if needed for Resvg compatibility
-            // Resvg doesn't support WebP embedded in SVG
-            let pngBuffer = buffer;
-            const needsConversion = detectedType?.mime !== "image/png";
+            let finalBuffer = buffer;
+            let mimeType = detectedType?.mime || "image/png";
 
-            if (needsConversion) {
-                logger.info(`Converting ${detectedType?.mime || "unknown"} image to png: ${url}`);
-                pngBuffer = await sharp(buffer).png().toBuffer();
+            // Only convert to PNG if specifically requested
+            if (convertToPng && detectedType?.mime !== "image/png") {
+                logger.info(`Converting ${detectedType?.mime || "unknown"} image to png for rendering: ${url}`);
+                finalBuffer = await sharp(buffer).png().toBuffer();
+                mimeType = "image/png";
             }
 
-            const base64 = pngBuffer.toString("base64");
-            return `data:image/png;base64,${base64}`;
+            const base64 = finalBuffer.toString("base64");
+            return `data:${mimeType};base64,${base64}`;
         } catch (error)
         {
             logger.warn(`Failed to fetch image ${url}: ${error.message}`);
@@ -45,13 +45,13 @@ export async function fetchImageAsBase64(url)
     });
 }
 
-export async function fetchImagesForProjects(projects)
+export async function fetchImagesForProjects(projects, convertToPng = false)
 {
     // Use concurrency limiting to prevent overwhelming the API
     const tasks = projects
         .filter(project => project.icon_url)
         .map(project => async () => {
-            project.icon_url_base64 = await fetchImageAsBase64(project.icon_url);
+            project.icon_url_base64 = await fetchImageAsBase64(project.icon_url, convertToPng);
         });
 
     await pLimit(tasks, MAX_CONCURRENT_REQUESTS);
