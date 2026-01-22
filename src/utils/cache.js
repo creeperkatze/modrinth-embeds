@@ -56,5 +56,3 @@ export class Cache {
 
 // Cache for API data (1 hour TTL)
 export const apiCache = new Cache(60);
-
-export default new Cache(10);

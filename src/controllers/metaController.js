@@ -1,19 +1,22 @@
 import modrinthClient from "../services/modrinthClient.js";
-import cache from "../utils/cache.js";
+import { apiCache } from "../utils/cache.js";
 import logger from "../utils/logger.js";
 
-const MAX_AGE = Math.floor(cache.ttl / 1000);
+const API_CACHE_TTL = 3600; // 1 hour
 
 export const getMeta = async (req, res, next) => {
     try {
         const { type, id } = req.params;
         const cacheKey = `meta:${type}:${id}`;
 
-        const cached = cache.get(cacheKey);
-        if (cached) {
-            logger.info(`Showing meta for ${type} "${id}" (cached)`);
-            res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
-            return res.json(cached);
+        const cached = apiCache.getWithMeta(cacheKey);
+        const cachedResult = cached?.value;
+
+        if (cachedResult) {
+            const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
+            logger.info(`Showing meta for ${type} "${id}" (cached ${minutesAgo}m ago)`);
+            res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
+            return res.json(cachedResult);
         }
 
         let name = id;
@@ -33,10 +36,10 @@ export const getMeta = async (req, res, next) => {
         }
 
         const result = { name };
-        cache.set(cacheKey, result);
+        apiCache.set(cacheKey, result);
         logger.info(`Showing meta for ${type} "${id}"`);
 
-        res.setHeader("Cache-Control", `public, max-age=${MAX_AGE}`);
+        res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);
     } catch (err) {
         logger.warn(`Error fetching meta for "${req.params.type}" "${req.params.id}": ${err.message}`);
