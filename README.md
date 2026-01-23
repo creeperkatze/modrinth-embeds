@@ -9,7 +9,7 @@ Generate beautiful, customizable and fast embeddable cards and badges for Modrin
 
 ## Quick Start
 
-Use the **[Website](modrinth-embeds.creeperkatze.de)** to visually configure and preview your embeds.
+Use the **[Website](https://modrinth-embeds.creeperkatze.de)** to visually configure and preview your embeds.
 
 Examples:
 
