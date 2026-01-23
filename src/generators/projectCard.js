@@ -16,7 +16,7 @@ import {
 
 const DEFAULT_VERSIONS_COUNT = 5;
 
-export function generateProjectCard(data, theme = "dark", options = {})
+export function generateProjectCard(data, options = {})
 {
     const { project, versions, stats } = data;
     const {
@@ -27,7 +27,7 @@ export function generateProjectCard(data, theme = "dark", options = {})
         backgroundColor = null
     } = options;
 
-    const colors = getThemeColors(theme, color, backgroundColor);
+    const colors = getThemeColors(color, backgroundColor);
 
     const projectTypeIconName = getProjectTypeIcon(project.project_type);
     const latestVersions = showVersions ? versions.slice(0, maxVersions) : [];

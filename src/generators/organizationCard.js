@@ -14,7 +14,7 @@ import {
 
 const DEFAULT_PROJECTS_COUNT = 5;
 
-export function generateOrganizationCard(data, theme = "dark", options = {})
+export function generateOrganizationCard(data, options = {})
 {
     const { organization, stats } = data;
     const {
@@ -25,7 +25,7 @@ export function generateOrganizationCard(data, theme = "dark", options = {})
         backgroundColor = null
     } = options;
 
-    const colors = getThemeColors(theme, color, backgroundColor);
+    const colors = getThemeColors(color, backgroundColor);
 
     const topProjects = showProjects ? stats.topProjects.slice(0, maxProjects) : [];
     const hasProjects = showProjects && topProjects.length > 0;

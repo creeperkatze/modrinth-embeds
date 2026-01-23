@@ -1,214 +1,92 @@
 # <a href="https://modrinth-embeds.creeperkatze.de"><img src=".github/assets/logo.png" alt="Logo" width="600"></a>
 
-Generate beautiful, embeddable cards and badges for Modrinth projects, users, organizations, and collections.
+Generate beautiful, customizable and fast embeddable cards and badges for Modrinth projects, users, organizations, and collections.
 
 [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/2d89t.svg)](https://status.creeperkatze.de)
 ![GitHub Issues](https://img.shields.io/github/issues/creeperkatze/modrinth-embeds?labelColor=0d143c)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modrinth-embeds?labelColor=0d143c)
 ![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modrinth-embeds?style=flat&labelColor=0d143c)
 
-## Features
+## Quick Start
 
-- **SVG Cards**: Rich, informative cards displaying stats, latest versions, and metadata
-- **Badges**: Compact badges showing download counts, follower counts, and version/project counts
-- **Multiple Entity Types**: Support for projects, users, organizations, and collections
-- **OpenGraph Metadata**: Generate meta tags for social media previews
-- **Lightweight**: Fast, cacheable SVG generation with no frontend dependencies
+Use the **[Website](modrinth-embeds.creeperkatze.de)** to visually configure and preview your embeds.
 
-## Usage
-
-### Web Configurator
-
-Visit **[modrinth-embeds.creeperkatze.de](https://modrinth-embeds.creeperkatze.de)** to configure and preview embeds with a visual interface.
-
-### Examples
+Examples:
 
 [![Prospector](https://modrinth-embeds.creeperkatze.de/user/prospector)](https://modrinth.com/user/prospector)
 [![Mod Menu](https://modrinth-embeds.creeperkatze.de/project/modmenu)](https://modrinth.com/project/modmenu)
 [![CaffeineMC](https://modrinth-embeds.creeperkatze.de/organization/caffeinemc)](https://modrinth.com/organization/caffeinemc)
+[![Featured - Vol. 38](https://modrinth-embeds.creeperkatze.de/collection/VEgGDFFE)](https://modrinth.com/collection/VEgGDFFE)
 
-### Embedding in Markdown
-
-```markdown
-[![Project Name](https://modrinth-embeds.creeperkatze.de/project/{slug})](https://modrinth.com/project/{slug})
-```
-
-### Embedding in HTML
-
-```html
-<a href="https://modrinth.com/project/{slug}">
-    <img src="https://modrinth-embeds.creeperkatze.de/project/{slug}" alt="Project Name" />
-</a>
-```
-
-## API Reference
+## Endpoints
 
 Base URL: `https://modrinth-embeds.creeperkatze.de`
 
-### Project Endpoints
+### Cards
 
-#### Get Project Card
+Pattern: `/<type>/<slug-or-id>`
 
-```
-GET /project/{slug}
-```
+Rich cards showing stats, versions, projects, and activity sparklines.
 
-Returns an SVG card with project stats, latest versions, loaders, and download counts.
-
-**Parameters:**
-
-- `slug` (path): Project slug or ID
-
-#### Get Project Download Badge
+| Type | Pattern |
+|------|---------|
+| Project | `/project/{slug}` |
+| User | `/user/{username}` |
+| Organization | `/organization/{id}` |
+| Collection | `/collection/{id}` |
 
 ```
-GET /project/{slug}/downloads
+https://modrinth-embeds.creeperkatze.de/project/modmenu
+https://modrinth-embeds.creeperkatze.de/user/prospector
+https://modrinth-embeds.creeperkatze.de/organization/caffeinemc
 ```
 
-Returns a compact badge showing total download count.
+#### Card Options
 
-#### Get Project Follower Badge
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `color` | Accent color (hex) | `#1bd96a` |
+| `backgroundColor` | Background color (hex) | `transparent` |
+| `showProjects` | Show top projects section | `true` |
+| `showVersions` | Show versions section | `true` |
+| `maxProjects` | Max projects to display (1-50) | `5` |
+| `maxVersions` | Max versions to display (1-50) | `5` |
+| `relativeTime` | Show relative time for dates | `true` |
+| `showSparklines` | Display activity sparklines | `true` |
 
-```
-GET /project/{slug}/followers
-```
+### Badges
 
-Returns a compact badge showing follower count.
+Pattern: `/<type>/<slug-or-id>/<metric>`
 
-#### Get Project Version Badge
+Compact badges showing a single metric.
 
-```
-GET /project/{slug}/versions
-```
+| Type | Available Metrics |
+|------|-------------------|
+| Project | `downloads`, `followers`, `versions` |
+| User | `downloads`, `projects`, `followers` |
+| Organization | `downloads`, `projects`, `followers` |
+| Collection | `downloads`, `projects`, `followers` |
 
-Returns a compact badge showing version count.
+| Badge Type | Example |
+|------------|---------|
+| Downloads | ![Downloads](https://modrinth-embeds.creeperkatze.de/project/modmenu/downloads) |
+| Followers | ![Followers](https://modrinth-embeds.creeperkatze.de/project/modmenu/followers) |
+| Versions | ![Versions](https://modrinth-embeds.creeperkatze.de/project/modmenu/versions) |
 
----
+#### Badge Options
 
-### User Endpoints
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `color` | Accent color (hex) | `#1bd96a` |
+| `backgroundColor` | Background color (hex) | `transparent` |
+| `format` | Output format (`svg` / `png`) | `svg` |
 
-#### Get User Card
+## Development
 
-```
-GET /user/{username}
-```
+### Prequisites
 
-Returns an SVG card with user stats and information.
-
-**Parameters:**
-
-- `username` (path): Username or user ID
-
-#### Get User Download Badge
-
-```
-GET /user/{username}/downloads
-```
-
-Returns a badge showing total downloads across all user projects.
-
-#### Get User Project Badge
-
-```
-GET /user/{username}/projects
-```
-
-Returns a badge showing total project count.
-
-#### Get User Follower Badge
-
-```
-GET /user/{username}/followers
-```
-
-Returns a badge showing follower count.
-
----
-
-### Organization Endpoints
-
-#### Get Organization Card
-
-```
-GET /organization/{id}
-```
-
-Returns an SVG card with organization stats and information.
-
-**Parameters:**
-
-- `id` (path): Organization ID
-
-#### Get Organization Download Badge
-
-```
-GET /organization/{id}/downloads
-```
-
-Returns a badge showing total downloads across all organization projects.
-
-#### Get Organization Project Badge
-
-```
-GET /organization/{id}/projects
-```
-
-Returns a badge showing total project count.
-
-#### Get Organization Follower Badge
-
-```
-GET /organization/{id}/followers
-```
-
-Returns a badge showing follower count.
-
----
-
-### Collection Endpoints
-
-#### Get Collection Card
-
-```
-GET /collection/{id}
-```
-
-Returns an SVG card with collection information.
-
-**Parameters:**
-
-- `id` (path): Collection ID
-
-#### Get Collection Download Badge
-
-```
-GET /collection/{id}/downloads
-```
-
-Returns a badge showing total downloads across all collection projects.
-
-#### Get Collection Project Badge
-
-```
-GET /collection/{id}/projects
-```
-
-Returns a badge showing project count in the collection.
-
-#### Get Collection Follower Badge
-
-```
-GET /collection/{id}/followers
-```
-
-Returns a badge showing follower count.
-
-## Deployment
-
-### Prerequisites
-
-- Node.js 18 or higher
-- pnpm (or npm/yarn)
+- Node.js
+- pnpm
 
 ### Installation
 
@@ -222,20 +100,17 @@ pnpm install
 
 # Start development server
 pnpm dev
-
-# Or start production server
-pnpm start
 ```
 
 ### Environment Variables
 
-Copy the `.env.example` file and rename it to `.env`
+Copy the `.env.example` file and rename it to `.env`.
 
 ## Contributing
 
 Contributions are always welcome!
 
-Please ensure you run `pnpm lint` before opening a pull request.
+Please ensure you run pnpm lint before opening a pull request.
 
 ## License
 

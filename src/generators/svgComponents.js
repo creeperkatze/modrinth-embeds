@@ -6,9 +6,8 @@ import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js
 import packageJson from "../../package.json" with { type: "json" };
 const VERSION = packageJson.version;
 
-export function getThemeColors(theme = "dark", customColor = null, backgroundColor = null)
+export function getThemeColors(customColor = null, backgroundColor = null)
 {
-    const isDark = theme === "dark";
     const defaultAccentColor = "#1bd96a";
 
     // Validate hex color format
@@ -21,7 +20,7 @@ export function getThemeColors(theme = "dark", customColor = null, backgroundCol
 
     return {
         bgColor,
-        textColor: isDark ? "#c9d1d9" : "#1e1e2e",
+        textColor: "#c9d1d9",
         accentColor,
         borderColor: "#E4E2E2"
     };

@@ -36,11 +36,10 @@ const handleCardRequest = async (req, res, next, cardType) => {
     try {
         const config = CARD_CONFIGS[cardType];
         const identifier = req.params[config.paramKey];
-        const theme = req.query.theme || "dark";
         const format = req.query.format;
 
-        // Determine if we need to fetch images (only for PNG generation)
-        const needsImages = req.isImageCrawler || format === "image";
+        // Determine if we need to render the svg as a image
+        const renderImage = req.isImageCrawler || format === "png";
 
         // Parse customization options
         const options = {
@@ -76,10 +75,10 @@ const handleCardRequest = async (req, res, next, cardType) => {
         }
 
         // Always regenerate the output from cached data
-        const svg = config.generator(data, theme, options);
+        const svg = config.generator(data, options);
 
-        // Generate PNG for Discord bots or when format=image is requested
-        if (needsImages) {
+        // Generate PNG for Discord bots or when format=png is requested
+        if (renderImage) {
             const { buffer: pngBuffer, renderTime } = await generatePng(svg);
 
             const apiTime = fromCache ? `cached (${cacheAge})` : (data.timings?.api ? `${Math.round(data.timings.api)}ms` : "N/A");
