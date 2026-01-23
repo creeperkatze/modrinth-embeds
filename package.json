@@ -12,7 +12,6 @@
   "license": "AGPL-3.0-only",
   "packageManager": "pnpm@10.27.0",
   "dependencies": {
-    "@resvg/resvg-js": "^2.6.2",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
