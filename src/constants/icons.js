@@ -223,5 +223,19 @@ export const ICONS = {
         <path d="M21 5v3" stroke="${color}" stroke-width="2" stroke-linecap="round" fill="none"/>
         <path d="M21 12l-3 5h4l-3 5" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <path d="M3 12a9 3 0 0 0 11.59 2.87" stroke="${color}" stroke-width="2" stroke-linecap="round" fill="none"/>
+    `,
+    "java-agent": (color = "currentColor") => `
+        <path d="M18 2L22 6" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M17 7L20 4" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M19 9L8.69995 19.3C7.69995 20.3 6.19995 20.3 5.29995 19.3L4.69995 18.7C3.69995 17.7 3.69995 16.2 4.69995 15.3L15 5" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M9 11L13 15" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M5 19L2 22" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M14 4L20 10" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    `,
+    rift: (color = "currentColor") => `
+        <path d="M2.7 6.6v10.8l9.3 5.3 9.3-5.3V6.6L12 1.3zm0 0L12 12m9.3-5.4L12 12m0 10.7V12" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    `,
+    modloader: (color = "currentColor") => `
+        <path d="M1.4 18V6h3.8v1.5h1.5V9h1.5V7.5h1.5V6h3.8v12H9.7v-5.3H9v1.5H6v-1.5h-.8V18H1.4zm12.1 0V6h3.8v9h5.3v3h-9.1z" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     `
 };
