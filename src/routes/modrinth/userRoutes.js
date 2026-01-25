@@ -4,12 +4,19 @@ import * as badgeController from "../../controllers/badgeController.js";
 
 const router = express.Router();
 
-router.get("/user/:username", cardController.getUser);
+// Modrinth prefixed routes
+router.get("/modrinth/user/:username", cardController.getUser);
 router.get("/card/summary/:username", (req, res) => res.redirect("/")); // Deprecated
 router.get("/card/user/:username", (req, res) => res.redirect("/")); // Deprecated
 
-router.get("/user/:username/downloads", badgeController.getUserDownloads);
-router.get("/user/:username/projects", badgeController.getUserProjects);
-router.get("/user/:username/followers", badgeController.getUserFollowers);
+router.get("/modrinth/user/:username/downloads", badgeController.getUserDownloads);
+router.get("/modrinth/user/:username/projects", badgeController.getUserProjects);
+router.get("/modrinth/user/:username/followers", badgeController.getUserFollowers);
+
+// Bare URL redirects (backward compatibility)
+router.get("/user/:username", (req, res) => res.redirect(301, `/modrinth/user/${req.params.username}`));
+router.get("/user/:username/downloads", (req, res) => res.redirect(301, `/modrinth/user/${req.params.username}/downloads`));
+router.get("/user/:username/projects", (req, res) => res.redirect(301, `/modrinth/user/${req.params.username}/projects`));
+router.get("/user/:username/followers", (req, res) => res.redirect(301, `/modrinth/user/${req.params.username}/followers`));
 
 export default router;

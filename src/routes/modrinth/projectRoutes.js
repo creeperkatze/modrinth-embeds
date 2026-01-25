@@ -4,10 +4,17 @@ import * as badgeController from "../../controllers/badgeController.js";
 
 const router = express.Router();
 
-router.get("/project/:slug", cardController.getProject);
+// Modrinth prefixed routes
+router.get("/modrinth/project/:slug", cardController.getProject);
 
-router.get("/project/:slug/downloads", badgeController.getProjectDownloads);
-router.get("/project/:slug/followers", badgeController.getProjectFollowers);
-router.get("/project/:slug/versions", badgeController.getProjectVersions);
+router.get("/modrinth/project/:slug/downloads", badgeController.getProjectDownloads);
+router.get("/modrinth/project/:slug/followers", badgeController.getProjectFollowers);
+router.get("/modrinth/project/:slug/versions", badgeController.getProjectVersions);
+
+// Bare URL redirects (backward compatibility)
+router.get("/project/:slug", (req, res) => res.redirect(301, `/modrinth/project/${req.params.slug}`));
+router.get("/project/:slug/downloads", (req, res) => res.redirect(301, `/modrinth/project/${req.params.slug}/downloads`));
+router.get("/project/:slug/followers", (req, res) => res.redirect(301, `/modrinth/project/${req.params.slug}/followers`));
+router.get("/project/:slug/versions", (req, res) => res.redirect(301, `/modrinth/project/${req.params.slug}/versions`));
 
 export default router;

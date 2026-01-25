@@ -129,7 +129,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <div>
                     <a href="/" class="inline-block no-underline">
-                        <div class="flex items-center gap-4 mb-2">
+                        <div class="flex items-center gap-3 mb-2">
                             <img src="/favicon.svg" alt="Modfolio Logo" class="w-8 h-8" />
                             <h1 class="text-modrinth-green mb-0 leading-8 text-4xl font-extrabold">Modfolio</h1>
                         </div>
@@ -1128,7 +1128,7 @@
                             urlParams.set("backgroundColor", selectedBgColor);
                         }
                         const queryString = urlParams.toString();
-                        url = `${window.location.origin}/${type}/${identifierValue}${queryString ? "?" + queryString : ""}`;
+                        url = `${window.location.origin}/modrinth/${type}/${identifierValue}${queryString ? "?" + queryString : ""}`;
                     }
                 } else {
                     const badgeParams = new URLSearchParams();
@@ -1142,7 +1142,7 @@
                     if (selectedPlatform === "curseforge") {
                         url = `${window.location.origin}/curseforge/project/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
                     } else {
-                        url = `${window.location.origin}/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
+                        url = `${window.location.origin}/modrinth/${type}/${identifierValue}/${badgeMetric.value}${badgeQuery ? "?" + badgeQuery : ""}`;
                     }
                 }
 
