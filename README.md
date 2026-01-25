@@ -80,7 +80,7 @@ Compact badges showing a single metric.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/modrinth-embeds.git
+git clone https://github.com/creeperkatze/modrinth-embeds.git
 cd modrinth-embeds
 
 # Install dependencies
