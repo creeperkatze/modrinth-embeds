@@ -1514,8 +1514,10 @@
                         if (res.ok) {
                             const data = await res.json();
                             if (data?.name) {
-                                markdownOutput.textContent = `[![${data.name}](${url})](${modrinthUrl})`;
-                                htmlOutput.textContent = `<a href="${modrinthUrl}"><img src="${url}" alt="${data.name}" /></a>`;
+                                const targetUrl = data?.url || modrinthUrl;
+                                markdownOutput.textContent = `[![${data.name}](${url})](${targetUrl})`;
+                                htmlOutput.textContent = `<a href="${targetUrl}"><img src="${url}" alt="${data.name}" /></a>`;
+                                previewLink.href = targetUrl;
                             }
                         }
                     } catch {}

@@ -30,8 +30,9 @@ export const getCfMeta = async (req, res, next) => {
         const modResponse = await curseforgeClient.getMod(projectId);
         const mod = modResponse.data;
         const name = mod?.name || projectId;
+        const url = mod?.links?.websiteUrl || null;
 
-        const result = { name };
+        const result = { name, url };
         apiCache.set(cacheKey, result);
         logger.info(`Showing curseforge meta for project "${projectId}"`);
 
