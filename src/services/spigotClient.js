@@ -57,8 +57,7 @@ export class SpigotClient extends BasePlatformClient
      */
     async getResourceVersions(resourceId, limit = 10)
     {
-        // Spigot API: GET /v2/resources/{resource}/versions?size={limit}
-        return this.fetch(`/v2/resources/${resourceId}/versions?size=${limit}&sort=-date`);
+        return this.fetch(`/v2/resources/${resourceId}/versions?size=${limit}&sort=-releaseDate`);
     }
 
     /**
