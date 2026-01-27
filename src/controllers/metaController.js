@@ -15,7 +15,7 @@ export const getMeta = async (req, res, next) => {
 
         if (cachedResult) {
             const minutesAgo = Math.round((Date.now() - cached.cachedAt) / 60000);
-            logger.info(`Showing meta for ${type} "${id}" (cached ${minutesAgo}m ago)`);
+            logger.info(`Showing Modrinth meta for ${type} "${id}" (cached ${minutesAgo}m ago)`);
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             return res.json(cachedResult);
         }
@@ -38,7 +38,7 @@ export const getMeta = async (req, res, next) => {
 
         const result = { name };
         apiCache.set(cacheKey, result);
-        logger.info(`Showing meta for ${type} "${id}"`);
+        logger.info(`Showing Modrinth meta for ${type} "${id}"`);
 
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.json(result);

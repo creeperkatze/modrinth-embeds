@@ -1504,12 +1504,12 @@
                     try {
                         const config = PLATFORMS[selectedPlatform];
                         const metaPath = selectedPlatform === "curseforge"
-                            ? `/meta/curseforge/${encodeURIComponent(identifierValue)}`
+                            ? `/curseforge/meta/${encodeURIComponent(identifierValue)}`
                             : selectedPlatform === "hangar"
-                            ? `/meta/hangar/${encodeURIComponent(identifierValue)}`
+                            ? `/hangar/meta/${encodeURIComponent(identifierValue)}?type=${type}`
                             : selectedPlatform === "spigot"
                             ? `/spigot/meta/${encodeURIComponent(identifierValue)}`
-                            : `/meta/${type}/${encodeURIComponent(identifierValue)}`;
+                            : `/modrinth/meta/${type}/${encodeURIComponent(identifierValue)}`;
                         const res = await fetch(metaPath);
                         if (res.ok) {
                             const data = await res.json();
