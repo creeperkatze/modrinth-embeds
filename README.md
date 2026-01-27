@@ -137,8 +137,8 @@ Compact badges showing a single metric.
 
 ```bash
 # Clone the repository
-git clone https://github.com/creeperkatze/modfolio.git
-cd modfolio
+git clone https://github.com/creeperkatze/modrinth-embeds.git
+cd modrinth-embeds
 
 # Install dependencies
 pnpm install
