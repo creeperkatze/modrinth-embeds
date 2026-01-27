@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { fetchImageAsBase64, fetchImagesForProjects, fetchVersionDatesForProjects } from "../utils/imageFetcher.js";
 import { aggregateAllStats, normalizeV3ProjectFields, aggregateProjectStats } from "../utils/statsAggregator.js";
 import { performance } from "perf_hooks";
+import { BasePlatformClient } from "./baseClient.js";
 
 dotenv.config({ quiet: true });
 
@@ -12,78 +13,59 @@ const MODRINTH_API_URL = process.env.MODRINTH_API_URL;
 const MODRINTH_API_V3_URL = process.env.MODRINTH_API_V3_URL;
 const USER_AGENT = process.env.USER_AGENT;
 
-// Default number of top projects to display
-const DEFAULT_TOP_PROJECTS_COUNT = 5;
+// Default number of top projects/versions to display
+const DEFAULT_TOP_PROJECTS_COUNT = 10;
 
-export class ModrinthClient
+export class ModrinthClient extends BasePlatformClient
 {
-    async fetch(url)
+    constructor()
     {
-        const response = await fetch(url, {
-            headers: { "User-Agent": USER_AGENT.replace("{version}", VERSION) }
+        super("Modrinth", {
+            baseUrl: MODRINTH_API_URL,
+            userAgent: USER_AGENT ? USER_AGENT.replace("{version}", VERSION) : undefined
         });
-
-        if (!response.ok)
-        {
-            if (response.status === 404)
-            {
-                throw new Error("Resource not found");
-            }
-
-            const errorBody = await response.text().catch(() => "");
-            let errorText = errorBody;
-
-            try
-            {
-                const json = JSON.parse(errorBody);
-                errorText = json.error || json.message || json.description || errorBody;
-            } catch { }
-
-            throw new Error(`Modrinth API error: ${response.status}: ${errorText}`);
-        }
-
-        return response.json();
+        this.v3BaseUrl = MODRINTH_API_V3_URL;
     }
 
     async getUser(username)
     {
-        return this.fetch(`${MODRINTH_API_URL}/user/${username}`);
+        return this.fetch(`/user/${username}`);
     }
 
     async getUserProjects(username)
     {
-        return this.fetch(`${MODRINTH_API_URL}/user/${username}/projects`);
+        return this.fetch(`/user/${username}/projects`);
     }
 
     async getProject(slug)
     {
-        return this.fetch(`${MODRINTH_API_URL}/project/${slug}`);
+        return this.fetch(`/project/${slug}`);
     }
 
     async getProjectVersions(slug)
     {
-        return this.fetch(`${MODRINTH_API_URL}/project/${slug}/version?include_changelog=false`);
+        return this.fetch(`/project/${slug}/version?include_changelog=false`);
     }
 
     async getOrganization(id)
     {
-        return this.fetch(`${MODRINTH_API_V3_URL}/organization/${id}`);
+        return this.fetch(`${this.v3BaseUrl}/organization/${id}`);
     }
 
     async getOrganizationProjects(id)
     {
-        return this.fetch(`${MODRINTH_API_V3_URL}/organization/${id}/projects`);
+        return this.fetch(`${this.v3BaseUrl}/organization/${id}/projects`);
     }
 
     async getCollection(id)
     {
-        return this.fetch(`${MODRINTH_API_V3_URL}/collection/${id}`);
+        return this.fetch(`${this.v3BaseUrl}/collection/${id}`);
     }
 
     async getProjects(ids)
     {
         const idsParam = JSON.stringify(ids);
-        return this.fetch(`${MODRINTH_API_URL}/projects?ids=${encodeURIComponent(idsParam)}`);
+        return this.fetch(`/projects?ids=${encodeURIComponent(idsParam)}`);
     }
 
     async getUserStats(username, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
@@ -94,6 +76,11 @@ export class ModrinthClient
             this.getUser(username),
             this.getUserProjects(username)
         ]);
+
+        // Return null if user not found
+        if (!user) {
+            return null;
+        }
 
         const apiTime = performance.now() - apiStart;
 
@@ -136,6 +123,11 @@ export class ModrinthClient
             this.getProjectVersions(slug)
         ]);
 
+        // Return null if project not found
+        if (!project) {
+            return null;
+        }
+
         const apiTime = performance.now() - apiStart;
 
         let imageConversionTime = 0;
@@ -172,6 +164,11 @@ export class ModrinthClient
             this.getOrganization(id),
             this.getOrganizationProjects(id)
         ]);
+
+        // Return null if organization not found
+        if (!organization) {
+            return null;
+        }
 
         const apiTime = performance.now() - apiStart;
 
@@ -212,6 +209,11 @@ export class ModrinthClient
         const apiStart = performance.now();
 
         const collection = await this.getCollection(id);
+
+        // Return null if collection not found
+        if (!collection) {
+            return null;
+        }
 
         const projects = collection.projects && collection.projects.length > 0
             ? await this.getProjects(collection.projects)
@@ -261,6 +263,11 @@ export class ModrinthClient
             this.getUserProjects(username)
         ]);
 
+        // Return null if user not found
+        if (!user) {
+            return null;
+        }
+
         const apiTime = performance.now() - apiStart;
 
         const stats = {
@@ -277,6 +284,11 @@ export class ModrinthClient
         const apiStart = performance.now();
 
         const project = await this.getProject(slug);
+
+        // Return null if project not found
+        if (!project) {
+            return null;
+        }
 
         let apiTime = performance.now() - apiStart;
 
@@ -309,6 +321,11 @@ export class ModrinthClient
             this.getOrganizationProjects(id)
         ]);
 
+        // Return null if organization not found
+        if (!organization) {
+            return null;
+        }
+
         const apiTime = performance.now() - apiStart;
 
         const projects = normalizeV3ProjectFields(rawProjects);
@@ -327,6 +344,11 @@ export class ModrinthClient
         const apiStart = performance.now();
 
         const collection = await this.getCollection(id);
+
+        // Return null if collection not found
+        if (!collection) {
+            return null;
+        }
 
         let stats = {
             totalDownloads: 0,

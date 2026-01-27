@@ -1,13 +1,19 @@
 import modrinthClient from "../services/modrinthClient.js";
+import curseforgeClient from "../services/curseforgeClient.js";
+import hangarClient from "../services/hangarClient.js";
+import spigotClient from "../services/spigotClient.js";
 import { apiCache } from "../utils/cache.js";
 import { generateBadge } from "../generators/badge.js";
 import { formatNumber } from "../utils/formatters.js";
 import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
+import { modrinthKeys, curseforgeKeys, hangarKeys, spigotKeys } from "../utils/cacheKeys.js";
+import { PLATFORMS } from "../constants/platforms.js";
 
 const API_CACHE_TTL = 3600; // 1 hour
 
 const BADGE_CONFIGS = {
+    // Modrinth entities
     user: {
         downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
         projects: { label: "Projects", getValue: stats => stats.projectCount.toString() },
@@ -27,21 +33,81 @@ const BADGE_CONFIGS = {
         downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
         projects: { label: "Projects", getValue: stats => stats.projectCount.toString() },
         followers: { label: "Followers", getValue: stats => formatNumber(stats.totalFollowers) }
+    },
+    // CurseForge entities
+    curseforge_project: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.downloads) },
+        rank: { label: "Rank", getValue: stats => stats.rank ? `#${stats.rank}` : "N/A" },
+        versions: { label: "Files", getValue: stats => stats.fileCount.toString() }
+    },
+    // Hangar entities
+    hangar_project: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.downloads) },
+        versions: { label: "Versions", getValue: stats => stats.versionCount.toString() },
+        views: { label: "Views", getValue: stats => formatNumber(stats.views) }
+    },
+    hangar_user: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
+        projects: { label: "Projects", getValue: stats => stats.projectCount.toString() },
+        stars: { label: "Stars", getValue: stats => formatNumber(stats.totalFollowers) }
+    },
+    // Spigot entities
+    spigot_resource: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.downloads) },
+        likes: { label: "Likes", getValue: stats => formatNumber(stats.likes) },
+        rating: { label: "Rating", getValue: stats => stats.rating ? stats.rating.toFixed(1) : "N/A" },
+        versions: { label: "Versions", getValue: stats => stats.versionCount.toString() }
+    },
+    spigot_author: {
+        downloads: { label: "Downloads", getValue: stats => formatNumber(stats.totalDownloads) },
+        resources: { label: "Resources", getValue: stats => stats.resourceCount.toString() },
+        rating: { label: "Rating", getValue: stats => stats.avgRating ? stats.avgRating.toString() : "N/A" }
     }
 };
 
 const DATA_FETCHERS = {
+    // Modrinth fetchers
     user: modrinthClient.getUserBadgeStats.bind(modrinthClient),
     project: modrinthClient.getProjectBadgeStats.bind(modrinthClient),
     organization: modrinthClient.getOrganizationBadgeStats.bind(modrinthClient),
-    collection: modrinthClient.getCollectionBadgeStats.bind(modrinthClient)
+    collection: modrinthClient.getCollectionBadgeStats.bind(modrinthClient),
+    // CurseForge fetchers
+    curseforge_project: curseforgeClient.getModBadgeStats.bind(curseforgeClient),
+    // Hangar fetchers
+    hangar_project: hangarClient.getProjectBadgeStats.bind(hangarClient),
+    hangar_user: hangarClient.getUserBadgeStats.bind(hangarClient),
+    // Spigot fetchers
+    spigot_resource: spigotClient.getResourceBadgeStats.bind(spigotClient),
+    spigot_author: spigotClient.getAuthorBadgeStats.bind(spigotClient)
+};
+
+// Platform and cache key mapping for each entity type
+const ENTITY_CONFIG = {
+    user: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.userBadge },
+    project: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.projectBadge },
+    organization: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.organizationBadge },
+    collection: { platform: PLATFORMS.MODRINTH.id, platformName: "modrinth", cacheKeyFn: modrinthKeys.collectionBadge },
+    curseforge_project: { platform: PLATFORMS.CURSEFORGE.id, platformName: "curseforge", cacheKeyFn: curseforgeKeys.projectBadge },
+    hangar_project: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", cacheKeyFn: hangarKeys.projectBadge },
+    hangar_user: { platform: PLATFORMS.HANGAR.id, platformName: "hangar", cacheKeyFn: hangarKeys.userBadge },
+    spigot_resource: { platform: "spigot", platformName: "spigot", cacheKeyFn: spigotKeys.resourceBadge },
+    spigot_author: { platform: "spigot", platformName: "spigot", cacheKeyFn: spigotKeys.authorBadge }
 };
 
 const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
     try {
-        const identifier = req.params.username || req.params.slug || req.params.id;
+        const entityConfig = ENTITY_CONFIG[entityType];
+        const platform = entityConfig.platform;
+        const identifier = req.params.username || req.params.slug || req.params.id || req.params.projectId;
         const format = req.query.format;
-        const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : "#1bd96a";
+        const defaultColor = platform === PLATFORMS.CURSEFORGE.id
+            ? PLATFORMS.CURSEFORGE.defaultColor
+            : platform === PLATFORMS.HANGAR.id
+                ? PLATFORMS.HANGAR.defaultColor
+                : platform === "spigot"
+                    ? "#E8A838"
+                    : PLATFORMS.MODRINTH.defaultColor;
+        const color = req.query.color ? `#${req.query.color.replace(/^#/, "")}` : defaultColor;
         const backgroundColor = req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null;
         const config = BADGE_CONFIGS[entityType][badgeType];
 
@@ -49,7 +115,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const renderImage = req.isImageCrawler || format === "png";
 
         // API data cache key - independent of styling options
-        const apiCacheKey = `badge:${entityType}:${identifier}`;
+        const apiCacheKey = entityConfig.cacheKeyFn(identifier);
 
         // Check for cached stats data
         let cached = apiCache.getWithMeta(apiCacheKey);
@@ -58,7 +124,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
         if (!data) {
             // Only fetch versions for version count badges
-            const fetchVersions = entityType === "project" && badgeType === "versions";
+            const fetchVersions = (entityType === "project" || entityType === "curseforge_project" || entityType === "hangar_project" || entityType === "spigot_resource") && badgeType === "versions";
             data = await DATA_FETCHERS[entityType](identifier, fetchVersions);
             apiCache.set(apiCacheKey, data);
         }
@@ -72,7 +138,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
 
         // Always regenerate the badge from cached data
         const value = config.getValue(data.stats);
-        const svg = generateBadge(config.label, value, color, backgroundColor, fromCache);
+        const svg = generateBadge(config.label, value, platform, color, backgroundColor, fromCache);
 
         // Generate PNG for Discord bots or when format=png is requested
         if (renderImage) {
@@ -84,7 +150,7 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
             const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
             const size = `${(Buffer.byteLength(pngBuffer) / 1024).toFixed(1)} KB`;
 
-            logger.info(`Showing ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
+            logger.info(`Showing ${entityConfig.platformName} ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}, render: ${pngTime}${crawlerLog}, size: ${size})`);
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
             res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
@@ -96,15 +162,16 @@ const handleBadgeRequest = async (req, res, next, entityType, badgeType) => {
         const crawlerType = req.crawlerType;
         const crawlerLog = crawlerType ? `, crawler: ${crawlerType}` : "";
         const size = `${(Buffer.byteLength(svg) / 1024).toFixed(1)} KB`;
-        logger.info(`Showing ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
+        logger.info(`Showing ${entityConfig.platformName} ${entityType} ${badgeType} badge for "${identifier}" (api: ${apiTime}${crawlerLog}, size: ${size})`);
 
         res.setHeader("Content-Type", "image/svg+xml");
         res.setHeader("Cache-Control", `public, max-age=${API_CACHE_TTL}`);
         res.setHeader("X-Cache", fromCache ? "HIT" : "MISS");
         res.send(svg);
     } catch (err) {
-        const identifier = req.params.username || req.params.slug || req.params.id;
-        logger.warn(`Error showing ${badgeType} badge for "${identifier}": ${err.message}`);
+        const identifier = req.params.username || req.params.slug || req.params.id || req.params.projectId;
+        const entityConfig = ENTITY_CONFIG[entityType];
+        logger.warn(`Error showing ${entityConfig.platformName} ${badgeType} badge for "${identifier}": ${err.message}`);
         next(err);
     }
 };
@@ -128,3 +195,29 @@ export const getOrganizationFollowers = (req, res, next) => handleBadgeRequest(r
 export const getCollectionDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "collection", "downloads");
 export const getCollectionProjects = (req, res, next) => handleBadgeRequest(req, res, next, "collection", "projects");
 export const getCollectionFollowers = (req, res, next) => handleBadgeRequest(req, res, next, "collection", "followers");
+
+// CurseForge mod badges
+export const getCfModDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "curseforge_project", "downloads");
+export const getCfModRank = (req, res, next) => handleBadgeRequest(req, res, next, "curseforge_project", "rank");
+export const getCfModVersions = (req, res, next) => handleBadgeRequest(req, res, next, "curseforge_project", "versions");
+
+// Hangar project badges
+export const getHangarProjectDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_project", "downloads");
+export const getHangarProjectVersions = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_project", "versions");
+export const getHangarProjectViews = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_project", "views");
+
+// Hangar user badges
+export const getHangarUserDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_user", "downloads");
+export const getHangarUserProjects = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_user", "projects");
+export const getHangarUserStars = (req, res, next) => handleBadgeRequest(req, res, next, "hangar_user", "stars");
+
+// Spigot resource badges
+export const getSpigotResourceDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_resource", "downloads");
+export const getSpigotResourceLikes = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_resource", "likes");
+export const getSpigotResourceRating = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_resource", "rating");
+export const getSpigotResourceVersions = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_resource", "versions");
+
+// Spigot author badges
+export const getSpigotAuthorDownloads = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_author", "downloads");
+export const getSpigotAuthorResources = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_author", "resources");
+export const getSpigotAuthorRating = (req, res, next) => handleBadgeRequest(req, res, next, "spigot_author", "rating");

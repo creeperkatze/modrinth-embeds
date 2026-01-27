@@ -65,13 +65,14 @@ export function generateActivitySparkline(versionDates, colors)
   </g>`;
 }
 
-export function generateHeader(entityType, iconName, title, colors)
+export function generateHeader(entityType, iconName, title, colors, platformIcon = null, platformIconViewBox = "0 0 512 514")
 {
     const icon = ICONS[iconName];
+    const platformIconSvg = platformIcon || ICONS.modrinth(colors.accentColor);
     return `
-  <!-- Modrinth Icon -->
-  <svg x="15" y="15" width="24" height="24" viewBox="0 0 512 514">
-    ${ICONS.modrinth(colors.accentColor)}
+  <!-- Platform Icon -->
+  <svg x="15" y="15" width="24" height="24" viewBox="${platformIconViewBox}">
+    ${platformIconSvg}
   </svg>
 
   <!-- Chevron -->
@@ -324,7 +325,7 @@ export function generateVersionListItem(version, index, colors, relativeTime)
   </g>`;
 }
 
-export function generateVersionList(versions, colors, relativeTime)
+export function generateVersionList(versions, colors, relativeTime, headerText = "Latest Versions")
 {
     if (!versions || versions.length === 0) return "";
 
@@ -333,9 +334,9 @@ export function generateVersionList(versions, colors, relativeTime)
     ).join("");
 
     return `
-  <!-- Latest Versions Header -->
+  <!-- Versions Header -->
   <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
-    Latest Versions
+    ${escapeXml(headerText)}
   </text>
 
   ${versionsHtml}`;
@@ -346,7 +347,7 @@ export function generateAttribution(height, colors)
     return `
   <!-- Bottom right attribution -->
   <text x="435" y="${height - 5}" font-family="Inter, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end" opacity="0.6">
-    modrinth-embeds.creeperkatze.de
+    modfolio.creeperkatze.de
   </text>`;
 }
 
