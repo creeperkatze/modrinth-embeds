@@ -135,7 +135,9 @@ function generateUserCard(data, options, platformConfig)
     const colors = getThemeColors(accentColor, backgroundColor);
     colors.accentColor = accentColor;
 
-    const topProjects = showProjects ? projects.slice(0, maxProjects) : [];
+    // Use stats.topProjects for Modrinth (sorted by downloads), or fall back to projects (already sorted for Hangar)
+    const projectsToUse = stats.topProjects || projects;
+    const topProjects = showProjects ? projectsToUse.slice(0, maxProjects) : [];
     const hasProjects = showProjects && topProjects.length > 0;
     const height = hasProjects ? 150 + (topProjects.length * 50) : 130;
 
@@ -205,7 +207,9 @@ function generateOrganizationCard(data, options, platformConfig)
     const colors = getThemeColors(accentColor, backgroundColor);
     colors.accentColor = accentColor;
 
-    const topProjects = showProjects ? projects.slice(0, maxProjects) : [];
+    // Use stats.topProjects for Modrinth (sorted by downloads), or fall back to projects (already sorted for Hangar)
+    const projectsToUse = stats.topProjects || projects;
+    const topProjects = showProjects ? projectsToUse.slice(0, maxProjects) : [];
     const hasProjects = showProjects && topProjects.length > 0;
     const height = hasProjects ? 150 + (topProjects.length * 50) : 130;
 
