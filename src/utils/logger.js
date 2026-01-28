@@ -64,7 +64,7 @@ if (!isVercel) {
 const logger = createLogger({
     level: "info",
     format: format.errors({ stack: true }),
-    defaultMeta: { service: "superslide-backend" },
+    defaultMeta: { service: "modfolio" },
     transports: loggerTransports,
 });
 
