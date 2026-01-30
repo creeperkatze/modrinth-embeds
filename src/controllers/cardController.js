@@ -123,8 +123,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const options = {
             showProjects: req.query.showProjects !== "false",
             showVersions: req.query.showVersions !== "false",
-            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 5),
-            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 5),
+            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 10),
+            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 10),
             relativeTime: req.query.relativeTime !== "false",
             showSparklines: req.query.showSparklines !== "false",
             color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null,

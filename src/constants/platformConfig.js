@@ -135,11 +135,11 @@ export const PLATFORM_CONFIGS = {
                 topProjects: "Top Projects"
             },
             errors: {
-                project: "Mod not found",
+                project: "Project not found",
                 user: "User not found",
                 organization: "Organization not found",
                 collection: "Collection not found",
-                mod: "Mod not found"
+                mod: "Project not found"
             }
         },
         statConfigs: STAT_CONFIGS.curseforge,

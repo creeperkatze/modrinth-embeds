@@ -95,7 +95,7 @@ export async function errorHandler(err, req, res)
     {
         statusCode = 404;
         if (isCurseforge) {
-            message = "Mod not found";
+            message = "Project not found";
         } else if (isHangar) {
             // Determine if this is a project or user request
             const isProjectRequest = req.path.includes("/project/");
