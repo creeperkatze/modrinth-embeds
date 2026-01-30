@@ -71,11 +71,10 @@ export class HangarClient extends BasePlatformClient
     /**
      * Get stats for a Hangar project (for card generation)
      * @param {string} projectSlug - The project slug
-     * @param {number} _maxVersions - Maximum versions to fetch (unused, kept for API compatibility)
+     * @param {number} maxVersions - Maximum versions to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    // eslint-disable-next-line no-unused-vars
-    async getProjectStats(projectSlug, _maxVersions = DEFAULT_VERSIONS_COUNT, convertToPng = false)
+    async getProjectStats(projectSlug, maxVersions = DEFAULT_VERSIONS_COUNT, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -100,11 +99,11 @@ export class HangarClient extends BasePlatformClient
         let versions = [];
         let totalVersionCount = 0;
         try {
-            const versionsResponse = await this.getProjectVersions(projectSlug, FETCH_VERSIONS_COUNT);
+            const versionsResponse = await this.getProjectVersions(projectSlug, maxVersions);
             const allVersions = versionsResponse?.result || [];
             totalVersionCount = versionsResponse?.pagination?.count ?? allVersions.length;
 
-            // Sort by date (newest first) - card generator will slice to maxVersions
+            // Sort by date (newest first)
             versions = allVersions
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map(version => {

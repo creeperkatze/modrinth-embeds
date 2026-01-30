@@ -77,6 +77,9 @@ export class CurseforgeClient extends BasePlatformClient
             return null; // Return null instead of throwing to avoid stack trace
         }
         const mod = modResponse.data;
+        if (!mod) {
+            return null;
+        }
 
         let imageConversionTime = 0;
 
@@ -167,6 +170,9 @@ export class CurseforgeClient extends BasePlatformClient
             return null; // Return null instead of throwing to avoid stack trace
         }
         const mod = modResponse.data;
+        if (!mod) {
+            return null;
+        }
 
         let apiTime = performance.now() - apiStart;
 
@@ -307,6 +313,9 @@ export class CurseforgeClient extends BasePlatformClient
             return null;
         }
         const user = userResponse.data;
+        if (!user) {
+            return null;
+        }
 
         let imageConversionTime = 0;
 
@@ -444,6 +453,9 @@ export class CurseforgeClient extends BasePlatformClient
             return null;
         }
         const user = userResponse.data;
+        if (!user) {
+            return null;
+        }
 
         let projectCount = 0;
 
