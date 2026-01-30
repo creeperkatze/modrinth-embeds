@@ -341,6 +341,29 @@ export class CurseforgeClient extends BasePlatformClient
                     if (result?.conversionTime) imageConversionTime += result.conversionTime;
                 }
 
+                // Fetch latest file to extract loaders
+                let loaders = [];
+                try {
+                    const filesResponse = await this.getModFiles(mod.id, 1);
+                    const files = filesResponse.data || [];
+                    if (files.length > 0) {
+                        const latestFile = files[0];
+                        // Extract loaders from sortableGameVersions based on gameVersionTypeId
+                        const loadersFromTypeId = (latestFile.sortableGameVersions || [])
+                            .map(v => GAME_VERSION_TYPE_IDS[v.gameVersionTypeId])
+                            .filter(Boolean);
+
+                        // Also extract loaders from gameVersions array by matching known loader names
+                        const loadersFromGameVersions = (latestFile.gameVersions || [])
+                            .filter(v => KNOWN_LOADERS.includes(v));
+
+                        // Combine and deduplicate
+                        loaders = [...new Set([...loadersFromTypeId, ...loadersFromGameVersions])];
+                    }
+                } catch {
+                    // If file fetch fails, continue without loaders
+                }
+
                 return {
                     id: mod.id,
                     title: mod.name,
@@ -350,7 +373,8 @@ export class CurseforgeClient extends BasePlatformClient
                     followers: 0, // CurseForge doesn't have followers for mods
                     date_created: mod.dateCreated,
                     icon_url_base64: icon_url_base64,
-                    icon: mod.logo?.url || null
+                    icon: mod.logo?.url || null,
+                    loaders: loaders
                 };
             }));
 
