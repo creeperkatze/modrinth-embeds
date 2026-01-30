@@ -38,7 +38,7 @@ export const getSpigotMeta = async (req, res, next) => {
             const authorName = data?.name || id;
             result = {
                 name: authorName,
-                url: `https://www.spigotmc.org/members/${authorName}.${id}/`
+                url: `https://www.spigotmc.org/resources/authors/${authorName}.${id}/`
             };
         } else {
             const resourceResponse = await spigotClient.getResource(id);
