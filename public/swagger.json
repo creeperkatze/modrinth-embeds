@@ -414,21 +414,6 @@
         }
       }
     },
-    "/curseforge/meta/{projectId}": {
-      "get": {
-        "tags": ["CurseForge"],
-        "summary": "Get CurseForge project metadata",
-        "description": "Returns JSON metadata for a CurseForge project. (Deprecated - use /curseforge/meta/project/:id instead)",
-        "deprecated": true,
-        "parameters": [
-          { "$ref": "#/components/parameters/ProjectId" }
-        ],
-        "responses": {
-          "200": { "$ref": "#/components/responses/JSON" },
-          "404": { "$ref": "#/components/responses/NotFound" }
-        }
-      }
-    },
     "/curseforge/meta/{type}/{id}": {
       "get": {
         "tags": ["CurseForge"],
