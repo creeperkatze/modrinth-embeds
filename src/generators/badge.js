@@ -1,6 +1,24 @@
 import { escapeXml } from "../utils/formatters.js";
 import { PLATFORMS, getPlatform } from "../constants/platforms.js";
 
+// Janky af
+function estimateTextWidth(text, fontSize)
+{
+    const narrow = "iljtIrf1 ";
+    const wide = "mwWM0";
+    let width = 0;
+    for (const char of text) {
+        if (narrow.includes(char)) {
+            width += fontSize * 0.3;
+        } else if (wide.includes(char)) {
+            width += fontSize * 0.75;
+        } else {
+            width += fontSize * 0.55;
+        }
+    }
+    return Math.ceil(width);
+}
+
 export function generateBadge(label, value, platformId = "modrinth", color = null, backgroundColor = null)
 {
     const platform = getPlatform(platformId) || PLATFORMS.MODRINTH;
@@ -9,8 +27,8 @@ export function generateBadge(label, value, platformId = "modrinth", color = nul
 
     const iconWidth = 30;
     const paddingX = 10;
-    const labelWidth = label.length * 8 + paddingX * 2;
-    const valueWidth = value.length * 8 + paddingX * 2;
+    const labelWidth = estimateTextWidth(label, 14)  + paddingX * 2;
+    const valueWidth = estimateTextWidth(value, 16) + paddingX * 2;
     const totalWidth = iconWidth + labelWidth + valueWidth;
     const height = 30;
 

@@ -27,7 +27,7 @@ export const PLATFORMS = {
         id: "spigot",
         name: "Spigot",
         defaultColor: "#E8A838",
-        icon: (color) => ICONS.spigot(color)
+        icon: (color) => ICONS.spigotPlatform(color)
     }
 };
 
