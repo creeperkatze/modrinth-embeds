@@ -1,6 +1,6 @@
 import { formatNumber } from "../../utils/formatters.js";
 import { getProjectTypeIcon } from "../../constants/loaderConfig.js";
-import { getStatConfigs, getEntityIcon } from "../../constants/platformConfig.js";
+import { getStatConfigs, getEntityIcon, CARD_LIMITS } from "../../constants/platformConfig.js";
 import {
     getThemeColors,
     generateSvgWrapper,
@@ -14,14 +14,12 @@ import {
     generateAttribution
 } from "../../utils/svgComponents.js";
 
-const DEFAULT_VERSIONS_COUNT = 5;
-
 export function generateProjectCard(data, options, platformConfig, entityType = "project")
 {
     const { project, versions, stats } = data;
     const {
         showVersions = true,
-        maxVersions = DEFAULT_VERSIONS_COUNT,
+        maxVersions = CARD_LIMITS.DEFAULT_COUNT,
         showSparklines = true,
         color = null,
         backgroundColor = null,

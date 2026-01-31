@@ -266,9 +266,9 @@
                             <div class="mb-2" id="maxProjectsSection">
                                 <div class="flex justify-between items-center mb-2">
                                     <h3 class="text-text-secondary text-base font-semibold">Max Projects</h3>
-                                    <span class="dynamic-color text-base font-bold" id="maxProjectsValue">5</span>
+                                    <span class="dynamic-color text-base font-bold" id="maxProjectsValue"></span>
                                 </div>
-                                <input type="range" id="maxProjects" min="1" max="10" value="5" class="w-full" />
+                                <input type="range" id="maxProjects" class="w-full" />
                             </div>
 
                             <div class="mb-2 hidden" id="showVersionsSection">
@@ -281,9 +281,9 @@
                             <div class="mb-2 hidden" id="maxVersionsSection">
                                 <div class="flex justify-between items-center">
                                     <h3 class="text-text-secondary text-base font-semibold" id="maxVersionsLabel">Max Versions</h3>
-                                    <span class="dynamic-color text-base font-bold" id="maxVersionsValue">5</span>
+                                    <span class="dynamic-color text-base font-bold" id="maxVersionsValue"></span>
                                 </div>
-                                <input type="range" id="maxVersions" min="1" max="10" value="5" class="w-full" />
+                                <input type="range" id="maxVersions" class="w-full" />
                             </div>
 
                             <div class="mb-2 hidden" id="relativeTimeSection">
@@ -484,6 +484,11 @@
             const platformSpigot = document.getElementById("platformSpigot");
             const urlLabel = document.getElementById("urlLabel");
             const valueLabel = document.getElementById("valueLabel");
+
+            const CARD_LIMITS = {
+                DEFAULT_COUNT: 5,
+                MAX_COUNT: 10
+            };
 
             // Platform configuration (mirrors backend PLATFORMS constant)
             const PLATFORMS = {
@@ -715,6 +720,7 @@
                 updateLabels();
                 updateUI();
                 updateUrl();
+                generate();
             }
 
             // Update platform-specific UI theme (colors, buttons, etc.)
@@ -832,12 +838,12 @@
 
                 // Reset customization options
                 showProjects.checked = true;
-                maxProjects.value = 5;
-                maxProjectsValue.textContent = "5";
+                maxProjects.value = CARD_LIMITS.DEFAULT_COUNT;
+                maxProjectsValue.textContent = CARD_LIMITS.DEFAULT_COUNT;
 
                 showVersions.checked = true;
-                maxVersions.value = 5;
-                maxVersionsValue.textContent = "5";
+                maxVersions.value = CARD_LIMITS.DEFAULT_COUNT;
+                maxVersionsValue.textContent = CARD_LIMITS.DEFAULT_COUNT;
 
                 relativeTime.checked = true;
                 showSparklines.checked = true;
@@ -967,9 +973,9 @@
                     metric: params.get("metric") || "downloads",
                     value: params.get("value") || "",
                     showProjects: params.get("showProjects") !== "false",
-                    maxProjects: parseInt(params.get("maxProjects")) || 5,
+                    maxProjects: parseInt(params.get("maxProjects")) || CARD_LIMITS.DEFAULT_COUNT,
                     showVersions: params.get("showVersions") !== "false",
-                    maxVersions: parseInt(params.get("maxVersions")) || 5,
+                    maxVersions: parseInt(params.get("maxVersions")) || CARD_LIMITS.DEFAULT_COUNT,
                     relativeTime: params.get("relativeTime") !== "false",
                     showSparklines: params.get("showSparklines") !== "false",
                     color: params.get("color") || config.defaultColor,
@@ -1000,9 +1006,9 @@
                     const isSpigotAuthor = selectedPlatform === "spigot" && target === "author";
                     const supportsProjects = isModrinthUserOrg || isCurseforgeUser || isHangarUser || isSpigotAuthor;
                     if (!showProjects.checked && supportsProjects) params.set("showProjects", "false");
-                    if (maxProjects.value !== "5" && supportsProjects) params.set("maxProjects", maxProjects.value);
+                    if (maxProjects.value !== String(CARD_LIMITS.DEFAULT_COUNT) && supportsProjects) params.set("maxProjects", maxProjects.value);
                     if (!showVersions.checked) params.set("showVersions", "false");
-                    if (maxVersions.value !== "5") params.set("maxVersions", maxVersions.value);
+                    if (maxVersions.value !== String(CARD_LIMITS.DEFAULT_COUNT)) params.set("maxVersions", maxVersions.value);
                     if (!relativeTime.checked) params.set("relativeTime", "false");
                     if (!showSparklines.checked) params.set("showSparklines", "false");
                     if (selectedColor !== config.defaultColor) params.set("color", selectedColor);
@@ -1206,7 +1212,7 @@
                     if (selectedPlatform !== platform.id) {
                         selectedPlatform = platform.id;
                         selectedColor = PLATFORMS[platform.id].defaultColor;
-                        // Update platform UI elements only (skip updateUI/updateUrl which call generate)
+                        // Update platform UI elements only (skip updateUrl which calls generate)
                         updatePlatformTheme(platform.id);
                         updateTargetDropdown(platform.id);
                         updateColorOptions(platform.id);
@@ -1215,6 +1221,8 @@
                     }
                     // Set the parsed type
                     targetType.value = parsed.type;
+                    // Update UI labels (Project ID vs Project Slug, etc.)
+                    updateUI();
 
                     // For CurseForge, silently resolve slug/username to ID in background
                     if (parsed.isCurseForge) {
@@ -1263,6 +1271,7 @@
                             identifier.value = parsed.id;
                             updateUI();
                             updateUrl();
+                            generate();
                         }
                     } else {
                         curseforgeSlug = null;
@@ -1270,6 +1279,7 @@
                         // Now safely call updateUI and updateUrl with correct values
                         updateUI();
                         updateUrl();
+                        generate();
                     }
                 }
             });
@@ -1330,8 +1340,6 @@
                 maxVersionsSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
                 relativeTimeSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
                 showSparklinesSection.classList.toggle("hidden", !isCard);
-
-                generate();
             }
 
             async function generate() {
@@ -1386,7 +1394,7 @@
                             if (!showVersions.checked) {
                                 urlParams.set("showVersions", "false");
                             }
-                            if (maxVersions.value !== "5") {
+                            if (maxVersions.value !== String(CARD_LIMITS.DEFAULT_COUNT)) {
                                 urlParams.set("maxVersions", maxVersions.value);
                             }
                             if (!relativeTime.checked) {
@@ -1399,7 +1407,7 @@
                             if (!showProjects.checked) {
                                 urlParams.set("showProjects", "false");
                             }
-                            if (maxProjects.value !== "5") {
+                            if (maxProjects.value !== String(CARD_LIMITS.DEFAULT_COUNT)) {
                                 urlParams.set("maxProjects", maxProjects.value);
                             }
                             if (!showSparklines.checked) {
@@ -1422,7 +1430,7 @@
                             if (!showVersions.checked) {
                                 urlParams.set("showVersions", "false");
                             }
-                            if (maxVersions.value !== "5") {
+                            if (maxVersions.value !== String(CARD_LIMITS.DEFAULT_COUNT)) {
                                 urlParams.set("maxVersions", maxVersions.value);
                             }
                             if (!relativeTime.checked) {
@@ -1432,7 +1440,7 @@
                             if (!showProjects.checked) {
                                 urlParams.set("showProjects", "false");
                             }
-                            if (maxProjects.value !== "5") {
+                            if (maxProjects.value !== String(CARD_LIMITS.DEFAULT_COUNT)) {
                                 urlParams.set("maxProjects", maxProjects.value);
                             }
                         }
@@ -1455,7 +1463,7 @@
                             if (!showVersions.checked) {
                                 urlParams.set("showVersions", "false");
                             }
-                            if (maxVersions.value !== "5") {
+                            if (maxVersions.value !== String(CARD_LIMITS.DEFAULT_COUNT)) {
                                 urlParams.set("maxVersions", maxVersions.value);
                             }
                             if (!relativeTime.checked) {
@@ -1465,7 +1473,7 @@
                             if (!showProjects.checked) {
                                 urlParams.set("showProjects", "false");
                             }
-                            if (maxProjects.value !== "5") {
+                            if (maxProjects.value !== String(CARD_LIMITS.DEFAULT_COUNT)) {
                                 urlParams.set("maxProjects", maxProjects.value);
                             }
                         }
@@ -1485,13 +1493,13 @@
                         if (!showProjects.checked && ["user", "organization", "collection"].includes(type)) {
                             urlParams.set("showProjects", "false");
                         }
-                        if (maxProjects.value !== "5" && ["user", "organization", "collection"].includes(type)) {
+                        if (maxProjects.value !== String(CARD_LIMITS.DEFAULT_COUNT) && ["user", "organization", "collection"].includes(type)) {
                             urlParams.set("maxProjects", maxProjects.value);
                         }
                         if (!showVersions.checked && type === "project") {
                             urlParams.set("showVersions", "false");
                         }
-                        if (maxVersions.value !== "5" && type === "project") {
+                        if (maxVersions.value !== String(CARD_LIMITS.DEFAULT_COUNT) && type === "project") {
                             urlParams.set("maxVersions", maxVersions.value);
                         }
                         if (!relativeTime.checked && type === "project") {
@@ -1656,10 +1664,12 @@
             embedType.addEventListener("change", () => {
                 updateUI();
                 updateUrl();
+                generate();
             });
             targetType.addEventListener("change", () => {
                 updateUI();
                 updateUrl();
+                generate();
             });
             badgeMetric.addEventListener("change", () => {
                 generate();
@@ -1672,6 +1682,7 @@
             showProjects.addEventListener("change", () => {
                 updateUI();
                 updateUrl();
+                generate();
             });
             maxProjects.addEventListener("input", () => {
                 maxProjectsValue.textContent = maxProjects.value;
@@ -1681,6 +1692,7 @@
             showVersions.addEventListener("change", () => {
                 updateUI();
                 updateUrl();
+                generate();
             });
             maxVersions.addEventListener("input", () => {
                 maxVersionsValue.textContent = maxVersions.value;
@@ -1741,8 +1753,18 @@
             function hasCustomizationFromUrl(params) {
                 const config = PLATFORMS[params.platform];
                 const relevantPlatform = params.platform === "modrinth" || params.platform === "curseforge" || params.platform === "hangar" || params.platform === "spigot";
-                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== 5) || params.showVersions === false || params.maxVersions !== 5 || params.relativeTime === false || params.showSparklines === false || params.color !== config.defaultColor || params.backgroundColor !== null;
+                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== CARD_LIMITS.DEFAULT_COUNT) || params.showVersions === false || params.maxVersions !== CARD_LIMITS.DEFAULT_COUNT || params.relativeTime === false || params.showSparklines === false || params.color !== config.defaultColor || params.backgroundColor !== null;
             }
+
+            // Initialize input attributes from CARD_LIMITS
+            maxProjects.min = 1;
+            maxProjects.max = CARD_LIMITS.MAX_COUNT;
+            maxProjects.value = CARD_LIMITS.DEFAULT_COUNT;
+            maxProjectsValue.textContent = CARD_LIMITS.DEFAULT_COUNT;
+            maxVersions.min = 1;
+            maxVersions.max = CARD_LIMITS.MAX_COUNT;
+            maxVersions.value = CARD_LIMITS.DEFAULT_COUNT;
+            maxVersionsValue.textContent = CARD_LIMITS.DEFAULT_COUNT;
 
             loadFromUrl();
         </script>

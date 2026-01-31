@@ -3,6 +3,7 @@ import { performance } from "perf_hooks";
 import { fetchImageAsBase64, fetchImagesForProjects, fetchVersionDatesForProjects } from "../utils/imageFetcher.js";
 import { BasePlatformClient } from "./baseClient.js";
 import logger from "../utils/logger.js";
+import { CARD_LIMITS } from "../constants/platformConfig.js";
 
 dotenv.config({ quiet: true });
 
@@ -12,13 +13,6 @@ const VERSION = packageJson.version;
 const HANGAR_API_URL = process.env.HANGAR_API_URL || "https://hangar.papermc.io";
 const HANGAR_API_KEY = process.env.HANGAR_API_KEY;
 const USER_AGENT = process.env.USER_AGENT;
-
-// Default number of versions to display
-const DEFAULT_VERSIONS_COUNT = 5;
-// Always fetch this many versions for caching (card generator slices to maxVersions)
-const FETCH_VERSIONS_COUNT = 10;
-// Default number of projects to display for users
-const DEFAULT_PROJECTS_COUNT = 5;
 
 /**
  * Hangar API client for fetching project data from Hangar (PaperMC's plugin platform)
@@ -74,7 +68,7 @@ export class HangarClient extends BasePlatformClient
      * @param {number} maxVersions - Maximum versions to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getProjectStats(projectSlug, maxVersions = DEFAULT_VERSIONS_COUNT, convertToPng = false)
+    async getProjectStats(projectSlug, maxVersions = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -99,7 +93,8 @@ export class HangarClient extends BasePlatformClient
         let versions = [];
         let totalVersionCount = 0;
         try {
-            const versionsResponse = await this.getProjectVersions(projectSlug, maxVersions);
+            // Always fetch max for caching (card generator slices to maxVersions)
+            const versionsResponse = await this.getProjectVersions(projectSlug, CARD_LIMITS.MAX_COUNT);
             const allVersions = versionsResponse?.result || [];
             totalVersionCount = versionsResponse?.pagination?.count ?? allVersions.length;
 
@@ -222,7 +217,7 @@ export class HangarClient extends BasePlatformClient
      * @param {number} maxProjects - Maximum projects to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getUserStats(username, maxProjects = DEFAULT_PROJECTS_COUNT, convertToPng = false)
+    async getUserStats(username, maxProjects = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -251,10 +246,10 @@ export class HangarClient extends BasePlatformClient
             const projectsResponse = await this.getUserProjects(username, 50); // Fetch more for sorting
             const allProjects = projectsResponse?.result || [];
 
-            // Sort by downloads and take maxProjects
+            // Sort by downloads and take max (for caching, card generator slices to maxProjects)
             projects = allProjects
                 .sort((a, b) => (b?.stats?.downloads || 0) - (a?.stats?.downloads || 0))
-                .slice(0, maxProjects)
+                .slice(0, CARD_LIMITS.MAX_COUNT)
                 .map(project => ({
                     slug: project.namespace?.slug,
                     id: project.namespace?.slug, // For fetchVersionDatesForProjects

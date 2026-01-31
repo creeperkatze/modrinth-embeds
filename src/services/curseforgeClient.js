@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { performance } from "perf_hooks";
 import { fetchImageAsBase64, fetchVersionDatesForProjects } from "../utils/imageFetcher.js";
 import { BasePlatformClient } from "./baseClient.js";
+import { CARD_LIMITS } from "../constants/platformConfig.js";
 
 dotenv.config({ quiet: true });
 
@@ -23,9 +24,6 @@ const FILTERED_TAGS = ["Client", "Server", "Singleplayer", "Java"];
 const GAME_VERSION_TYPE_IDS = {
     68441: "NeoForge",
 };
-
-// Default number of files to display
-const DEFAULT_FILES_COUNT = 5;
 
 export class CurseforgeClient extends BasePlatformClient
 {
@@ -52,7 +50,7 @@ export class CurseforgeClient extends BasePlatformClient
         return this.fetch(`/v1/mods/${modId}`);
     }
 
-    async getModFiles(modId, pageSize = 10)
+    async getModFiles(modId, pageSize = CARD_LIMITS.MAX_COUNT)
     {
         return this.fetch(`/v1/mods/${modId}/files?pageSize=${pageSize}`);
     }
@@ -63,7 +61,7 @@ export class CurseforgeClient extends BasePlatformClient
      * @param {number} maxFiles - Maximum files to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getModStats(modId, maxFiles = DEFAULT_FILES_COUNT, convertToPng = false)
+    async getModStats(modId, maxFiles = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
     {
         // Validate modId is a number
         if (!/^\d+$/.test(String(modId))) {
@@ -90,19 +88,19 @@ export class CurseforgeClient extends BasePlatformClient
             if (result?.conversionTime) imageConversionTime += result.conversionTime;
         }
 
-        // Fetch files for the mod
+        // Fetch files for the mod (always fetch max for caching, card generator slices to maxVersions)
         let versions = [];
         let totalFileCount = 0;
         try {
-            const filesResponse = await this.getModFiles(modId, maxFiles);
+            const filesResponse = await this.getModFiles(modId, CARD_LIMITS.MAX_COUNT);
             const allFiles = filesResponse.data || [];
             // Use pagination totalCount if available, otherwise use the array length
             totalFileCount = filesResponse.pagination?.totalCount ?? allFiles.length;
 
-            // Sort by date (newest first) and take maxFiles
+            // Sort by date (newest first) and take max (card generator will slice to maxVersions)
             versions = allFiles
                 .sort((a, b) => new Date(b.fileDate) - new Date(a.fileDate))
-                .slice(0, maxFiles)
+                .slice(0, CARD_LIMITS.MAX_COUNT)
                 .map(file => {
                     // Extract loaders from sortableGameVersions based on gameVersionTypeId
                     const loadersFromTypeId = (file.sortableGameVersions || [])
@@ -299,7 +297,7 @@ export class CurseforgeClient extends BasePlatformClient
      * @param {number} maxProjects - Maximum projects to fetch
      * @param {boolean} convertToPng - Whether to convert images to PNG
      */
-    async getUserStats(userId, maxProjects = 5, convertToPng = false)
+    async getUserStats(userId, maxProjects = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
     {
         // Validate userId is a number
         if (!/^\d+$/.test(String(userId))) {

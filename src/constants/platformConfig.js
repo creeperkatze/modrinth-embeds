@@ -1,8 +1,10 @@
 import { ICONS } from "./icons.js";
 
-/**
- * Platform-specific icon viewBox configurations
- */
+export const CARD_LIMITS = {
+    DEFAULT_COUNT: 5,
+    MAX_COUNT: 10
+};
+
 const PLATFORM_ICON_VIEWBOXES = {
     modrinth: "0 0 512 514",
     curseforge: "0 0 32 32",
@@ -10,10 +12,6 @@ const PLATFORM_ICON_VIEWBOXES = {
     spigot: "0 0 100 100"
 };
 
-/**
- * Stat label configurations per platform and entity type
- * Defines what stats to display and their labels/field mappings
- */
 const STAT_CONFIGS = {
     modrinth: {
         project: [
@@ -75,10 +73,6 @@ const STAT_CONFIGS = {
     }
 };
 
-/**
- * Platform configuration with all UI text and settings
- * Allows platforms to customize labels, terminology, and behavior
- */
 export const PLATFORM_CONFIGS = {
     modrinth: {
         id: "modrinth",
@@ -221,21 +215,10 @@ export const PLATFORM_CONFIGS = {
     }
 };
 
-/**
- * Get platform configuration by platform ID
- * @param {string} platformId - Platform ID (modrinth, curseforge, hangar)
- * @returns {Object|null} Platform configuration or null if not found
- */
 export function getPlatformConfig(platformId) {
     return PLATFORM_CONFIGS[platformId] || null;
 }
 
-/**
- * Get stat configuration for a specific platform and entity type
- * @param {string} platformId - Platform ID
- * @param {string} entityType - Entity type (project, user, organization, collection, mod, resource, author)
- * @returns {Array|null} Array of stat configs or null if not found
- */
 export function getStatConfigs(platformId, entityType) {
     const platform = PLATFORM_CONFIGS[platformId];
     if (!platform) return null;
@@ -258,12 +241,6 @@ export function getStatConfigs(platformId, entityType) {
     return platform.statConfigs[statKey] || null;
 }
 
-/**
- * Get error message for a platform and entity type
- * @param {string} platformId - Platform ID
- * @param {string} entityType - Entity type
- * @returns {string} Error message
- */
 export function getErrorMessage(platformId, entityType) {
     const platform = PLATFORM_CONFIGS[platformId];
     if (!platform) return "Resource not found";
@@ -284,9 +261,6 @@ export function getErrorMessage(platformId, entityType) {
     return platform.labels.errors[errorKey] || "Resource not found";
 }
 
-/**
- * Entity type icon names for header generation
- */
 export const ENTITY_ICONS = {
     project: "box",
     user: "user",
@@ -297,11 +271,6 @@ export const ENTITY_ICONS = {
     author: "user" // Spigot authors use user icon
 };
 
-/**
- * Get entity icon name for header
- * @param {string} entityType - Entity type
- * @returns {string} Icon name
- */
 export function getEntityIcon(entityType) {
     return ENTITY_ICONS[entityType] || "box";
 }

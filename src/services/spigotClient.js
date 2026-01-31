@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { performance } from "perf_hooks";
 import { fetchImageAsBase64 } from "../utils/imageFetcher.js";
 import { BasePlatformClient } from "./baseClient.js";
+import { CARD_LIMITS } from "../constants/platformConfig.js";
 
 dotenv.config({ quiet: true });
 
@@ -11,17 +12,6 @@ const VERSION = packageJson.version;
 const SPIGOT_API_URL = process.env.SPIGOT_API_URL || "https://api.spiget.org";
 const USER_AGENT = process.env.USER_AGENT;
 
-// Default number of versions to display
-const DEFAULT_VERSIONS_COUNT = 5;
-// Always fetch this many versions for caching
-const FETCH_VERSIONS_COUNT = 10;
-// Default number of resources to display for authors
-const DEFAULT_RESOURCES_COUNT = 5;
-
-/**
- * Spigot API client for fetching resource data from Spigot (SpigotMC API)
- * API Documentation: https://api.spiget.org/
- */
 export class SpigotClient extends BasePlatformClient
 {
     constructor()
@@ -38,58 +28,28 @@ export class SpigotClient extends BasePlatformClient
         return headers;
     }
 
-    /**
-     * Get resource data by ID
-     * @param {number} resourceId - The resource ID
-     * @returns {Promise<Object>} Resource data
-     */
     async getResource(resourceId)
     {
-        // Spigot API: GET /v2/resources/{resource}
         return this.fetch(`/v2/resources/${resourceId}`);
     }
 
-    /**
-     * Get resource versions
-     * @param {number} resourceId - The resource ID
-     * @param {number} limit - Maximum versions to fetch
-     * @returns {Promise<Object>} Versions data
-     */
     async getResourceVersions(resourceId, limit = 10)
     {
         return this.fetch(`/v2/resources/${resourceId}/versions?size=${limit}&sort=-releaseDate`);
     }
 
-    /**
-     * Get author data by ID
-     * @param {number} authorId - The author ID
-     * @returns {Promise<Object>} Author data
-     */
     async getAuthor(authorId)
     {
-        // Spigot API: GET /v2/authors/{author}
         return this.fetch(`/v2/authors/${authorId}`);
     }
 
-    /**
-     * Get author's resources
-     * @param {number} authorId - The author ID
-     * @param {number} limit - Maximum resources to fetch
-     * @returns {Promise<Object>} Resources data
-     */
     async getAuthorResources(authorId, limit = 25)
     {
-        // Spigot API: GET /v2/authors/{author}/resources?size={limit}
+
         return this.fetch(`/v2/authors/${authorId}/resources?size=${limit}&sort=-downloads`);
     }
 
-    /**
-     * Get stats for a Spigot resource (for card generation)
-     * @param {number} resourceId - The resource ID
-     * @param {number} maxVersions - Maximum versions to fetch
-     * @param {boolean} convertToPng - Whether to convert images to PNG
-     */
-    async getResourceStats(resourceId, maxVersions = DEFAULT_VERSIONS_COUNT, convertToPng = false)
+    async getResourceStats(resourceId, maxVersions = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
     {
         // Validate resourceId is a number
         if (!/^\d+$/.test(String(resourceId))) {
@@ -123,7 +83,7 @@ export class SpigotClient extends BasePlatformClient
         let versions = [];
         let totalVersionCount = 0;
         try {
-            const versionsResponse = await this.getResourceVersions(resourceId, FETCH_VERSIONS_COUNT);
+            const versionsResponse = await this.getResourceVersions(resourceId, CARD_LIMITS.MAX_COUNT);
             const allVersions = versionsResponse || [];
             totalVersionCount = allVersions.length;
 
@@ -167,13 +127,7 @@ export class SpigotClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Get stats for a Spigot author (for card generation)
-     * @param {number} authorId - The author ID
-     * @param {number} maxResources - Maximum resources to fetch
-     * @param {boolean} convertToPng - Whether to convert images to PNG
-     */
-    async getAuthorStats(authorId, maxResources = DEFAULT_RESOURCES_COUNT, convertToPng = false)
+    async getAuthorStats(authorId, maxResources = CARD_LIMITS.DEFAULT_COUNT, convertToPng = false)
     {
         // Validate authorId is a number
         if (!/^\d+$/.test(String(authorId))) {
@@ -205,10 +159,10 @@ export class SpigotClient extends BasePlatformClient
             const resourcesResponse = await this.getAuthorResources(authorId, 50); // Fetch more for sorting
             const allResources = resourcesResponse || [];
 
-            // Sort by downloads and take maxResources
+            // Sort by downloads and take max (for caching, card generator slices to maxResources)
             resources = allResources
                 .sort((a, b) => (b?.downloads || 0) - (a?.downloads || 0))
-                .slice(0, maxResources)
+                .slice(0, CARD_LIMITS.MAX_COUNT)
                 .map(r => ({
                     id: r.id,
                     slug: r.id, // Spigot uses IDs, not slugs
@@ -268,11 +222,6 @@ export class SpigotClient extends BasePlatformClient
         };
     }
 
-    /**
-     * Get badge stats for a Spigot resource (lightweight, no versions)
-     * @param {number} resourceId - The resource ID
-     * @param {boolean} fetchVersions - Whether to fetch versions for version count
-     */
     async getResourceBadgeStats(resourceId, fetchVersions = false)
     {
         // Validate resourceId is a number
@@ -312,10 +261,6 @@ export class SpigotClient extends BasePlatformClient
         return { stats, timings: { api: apiTime } };
     }
 
-    /**
-     * Get badge stats for a Spigot author (lightweight, no resource details)
-     * @param {number} authorId - The author ID
-     */
     async getAuthorBadgeStats(authorId)
     {
         // Validate authorId is a number
@@ -365,9 +310,6 @@ export class SpigotClient extends BasePlatformClient
         return { stats, timings: { api: apiTime } };
     }
 
-    /**
-     * Helper method to fetch images for Spigot resources
-     */
     async fetchImagesForResources(resources, convertToPng)
     {
         let totalConversionTime = 0;
@@ -391,9 +333,6 @@ export class SpigotClient extends BasePlatformClient
         return totalConversionTime;
     }
 
-    /**
-     * Calculate average rating from resources
-     */
     calculateAvgRating(resources)
     {
         const resourcesWithRating = resources.filter(r => r.rating && r.rating > 0);
@@ -403,9 +342,6 @@ export class SpigotClient extends BasePlatformClient
         return (sum / resourcesWithRating.length).toFixed(1);
     }
 
-    /**
-     * Check if API is accessible (no API key required for Spigot)
-     */
     isConfigured()
     {
         return true; // Spigot doesn't require an API key

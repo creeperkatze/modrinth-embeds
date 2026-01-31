@@ -1,5 +1,5 @@
 import { formatNumber } from "../../utils/formatters.js";
-import { getStatConfigs } from "../../constants/platformConfig.js";
+import { getStatConfigs, CARD_LIMITS } from "../../constants/platformConfig.js";
 import {
     getThemeColors,
     generateSvgWrapper,
@@ -13,14 +13,12 @@ import {
     generateAttribution
 } from "../../utils/svgComponents.js";
 
-const DEFAULT_PROJECTS_COUNT = 5;
-
 export function generateUserCard(data, options, platformConfig)
 {
     const { user, projects, stats } = data;
     const {
         showProjects = true,
-        maxProjects = DEFAULT_PROJECTS_COUNT,
+        maxProjects = CARD_LIMITS.DEFAULT_COUNT,
         showSparklines = true,
         color = null,
         backgroundColor = null,

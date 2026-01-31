@@ -3,6 +3,7 @@ import { fetchImageAsBase64, fetchImagesForProjects, fetchVersionDatesForProject
 import { aggregateAllStats, normalizeV3ProjectFields, aggregateProjectStats } from "../utils/statsAggregator.js";
 import { performance } from "perf_hooks";
 import { BasePlatformClient } from "./baseClient.js";
+import { CARD_LIMITS } from "../constants/platformConfig.js";
 
 dotenv.config({ quiet: true });
 
@@ -12,9 +13,6 @@ const VERSION = packageJson.version;
 const MODRINTH_API_URL = process.env.MODRINTH_API_URL;
 const MODRINTH_API_V3_URL = process.env.MODRINTH_API_V3_URL;
 const USER_AGENT = process.env.USER_AGENT;
-
-// Default number of top projects/versions to display
-const DEFAULT_TOP_PROJECTS_COUNT = 10;
 
 export class ModrinthClient extends BasePlatformClient
 {
@@ -68,7 +66,7 @@ export class ModrinthClient extends BasePlatformClient
         return this.fetch(`/projects?ids=${encodeURIComponent(idsParam)}`);
     }
 
-    async getUserStats(username, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
+    async getUserStats(username, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -84,8 +82,8 @@ export class ModrinthClient extends BasePlatformClient
 
         const apiTime = performance.now() - apiStart;
 
-        // Use combined aggregation for single-pass efficiency
-        const stats = aggregateAllStats(projects, maxProjects);
+        // Use combined aggregation for single-pass efficiency (always fetch max for caching)
+        const stats = aggregateAllStats(projects, CARD_LIMITS.MAX_COUNT);
         const topProjects = stats.topProjects;
 
         let imageConversionTime = 0;
@@ -114,7 +112,7 @@ export class ModrinthClient extends BasePlatformClient
         };
     }
 
-    async getProjectStats(slug, maxVersions = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
+    async getProjectStats(slug, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -139,7 +137,7 @@ export class ModrinthClient extends BasePlatformClient
 
         const latestVersions = [...versions]
             .sort((a, b) => new Date(b.date_published) - new Date(a.date_published))
-            .slice(0, maxVersions);
+            .slice(0, CARD_LIMITS.MAX_COUNT);
 
         return {
             project,
@@ -156,7 +154,7 @@ export class ModrinthClient extends BasePlatformClient
         };
     }
 
-    async getOrganizationStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
+    async getOrganizationStats(id, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -174,8 +172,8 @@ export class ModrinthClient extends BasePlatformClient
 
         const projects = normalizeV3ProjectFields(rawProjects);
 
-        // Use combined aggregation for single-pass efficiency
-        const stats = aggregateAllStats(projects, maxProjects);
+        // Use combined aggregation for single-pass efficiency (always fetch max for caching)
+        const stats = aggregateAllStats(projects, CARD_LIMITS.MAX_COUNT);
         const topProjects = stats.topProjects;
 
         let imageConversionTime = 0;
@@ -204,7 +202,7 @@ export class ModrinthClient extends BasePlatformClient
         };
     }
 
-    async getCollectionStats(id, maxProjects = DEFAULT_TOP_PROJECTS_COUNT, convertToPng = false)
+    async getCollectionStats(id, convertToPng = false)
     {
         const apiStart = performance.now();
 
@@ -221,8 +219,8 @@ export class ModrinthClient extends BasePlatformClient
 
         const apiTime = performance.now() - apiStart;
 
-        // Use optimized aggregation - only basic stats needed for collections
-        const { totalDownloads, totalFollowers, projectCount, topProjects } = aggregateProjectStats(projects, maxProjects);
+        // Use optimized aggregation - only basic stats needed for collections (always fetch max for caching)
+        const { totalDownloads, totalFollowers, projectCount, topProjects } = aggregateProjectStats(projects, CARD_LIMITS.MAX_COUNT);
 
         let imageConversionTime = 0;
         const collectionIconResult = collection.icon_url ? await fetchImageAsBase64(collection.icon_url, convertToPng) : null;

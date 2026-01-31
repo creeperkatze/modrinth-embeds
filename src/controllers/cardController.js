@@ -8,7 +8,7 @@ import logger from "../utils/logger.js";
 import { generatePng } from "../utils/generateImage.js";
 import { modrinthKeys, curseforgeKeys, hangarKeys, spigotKeys } from "../utils/cacheKeys.js";
 import { generateErrorCard } from "../middleware/errorHandler.js";
-import { getPlatformConfig, getErrorMessage } from "../constants/platformConfig.js";
+import { getPlatformConfig, getErrorMessage, CARD_LIMITS } from "../constants/platformConfig.js";
 
 const API_CACHE_TTL = 3600; // 1 hour
 
@@ -123,8 +123,8 @@ const handleCardRequest = async (req, res, next, cardType) => {
         const options = {
             showProjects: req.query.showProjects !== "false",
             showVersions: req.query.showVersions !== "false",
-            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || 5, 1), 10),
-            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || 5, 1), 10),
+            maxProjects: Math.min(Math.max(parseInt(req.query.maxProjects) || CARD_LIMITS.DEFAULT_COUNT, 1), CARD_LIMITS.MAX_COUNT),
+            maxVersions: Math.min(Math.max(parseInt(req.query.maxVersions) || CARD_LIMITS.DEFAULT_COUNT, 1), CARD_LIMITS.MAX_COUNT),
             relativeTime: req.query.relativeTime !== "false",
             showSparklines: req.query.showSparklines !== "false",
             color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null,
