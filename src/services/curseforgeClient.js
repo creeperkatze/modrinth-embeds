@@ -20,7 +20,6 @@ const KNOWN_LOADERS = ["Forge", "Fabric", "NeoForge", "Quilt", "Rift", "LiteLoad
 const FILTERED_TAGS = ["Client", "Server", "Singleplayer", "Java"];
 
 // CurseForge gameVersionTypeId to loader name mapping (for extracting loaders from sortableGameVersions)
-// These are type IDs that represent mod loaders rather than game versions
 const GAME_VERSION_TYPE_IDS = {
     68441: "NeoForge",
 };
@@ -239,11 +238,6 @@ export class CurseforgeClient extends BasePlatformClient
         throw new Error("User not found");
     }
 
-    /**
-     * Get username from user ID by searching for their projects
-     * @param {number|string} userId - The user ID
-     * @returns {Promise<string|null>} The username or null if not found
-     */
     async getUsernameFromUserId(userId)
     {
         const searchUrl = `${CURSEFORGE_API_URL}/v1/mods/search?gameId=432&authorId=${userId}&pageSize=1`;

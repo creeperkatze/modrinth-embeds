@@ -15,7 +15,7 @@ import {
 
 export function generateCollectionCard(data, options, platformConfig)
 {
-    const { collection, projects, stats } = data;
+    const { collection, stats } = data;
     const {
         showProjects = true,
         maxProjects = CARD_LIMITS.DEFAULT_COUNT,

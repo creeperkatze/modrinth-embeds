@@ -234,7 +234,7 @@ export function generateDivider(colors)
   <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
 }
 
-export function generateProjectList(topProjects, sectionTitle, colors, showSparklines = true, showDownloadBars = true, relativeTime = false)
+export function generateProjectList(topProjects, sectionTitle, colors, showSparklines = true, showDownloadBars = true)
 {
     if (!topProjects || topProjects.length === 0) return "";
 

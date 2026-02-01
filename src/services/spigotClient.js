@@ -340,7 +340,7 @@ export class SpigotClient extends BasePlatformClient
 
     isConfigured()
     {
-        return true; // Spigot doesn't require an API key
+        return true;
     }
 }
 

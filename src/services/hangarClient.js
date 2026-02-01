@@ -41,12 +41,6 @@ export class HangarClient extends BasePlatformClient
         return this.fetch(`/api/v1/projects/${encodeURIComponent(projectSlug)}`);
     }
 
-    /**
-     * Get project versions
-     * @param {string} projectSlug - The project slug
-     * @param {number} limit - Maximum versions to fetch
-     * @returns {Promise<Object>} Versions data
-     */
     async getProjectVersions(projectSlug, limit = 10)
     {
         // Hangar API endpoint for versions: /api/v1/projects/{slug}/versions
@@ -298,16 +292,12 @@ export class HangarClient extends BasePlatformClient
 
         const stats = {
             totalDownloads,
-            totalFollowers: 0, // Hangar doesn't have user followers
             projectCount
         };
 
         return { stats, timings: { api: apiTime } };
     }
 
-    /**
-     * Check if API key is configured
-     */
     isConfigured()
     {
         return !!HANGAR_API_KEY;
