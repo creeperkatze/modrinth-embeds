@@ -26,8 +26,14 @@ export function getThemeColors(customColor = null, backgroundColor = null)
     };
 }
 
-export function generateSvgWrapper(width, height, colors, content)
+export function generateSvgWrapper(width, height, colors, content, showBorder = true)
 {
+    const borderRect = showBorder
+        ? `    <rect stroke="${colors.borderColor}" fill="${colors.bgColor}" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
+`
+        : `    <rect fill="${colors.bgColor}" rx="4.5" width="${width}" height="${height}"/>
+`;
+
     return `
 <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -36,8 +42,7 @@ export function generateSvgWrapper(width, height, colors, content)
     </clipPath>
   </defs>
   <g clip-path="url(#outer_rectangle_summary)">
-    <rect stroke="${colors.borderColor}" fill="${colors.bgColor}" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
-${content}
+${borderRect}${content}
   </g>
 </svg>`.trim();
 }

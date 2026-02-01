@@ -308,6 +308,13 @@
                             </div>
 
                             <div class="mb-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="showBorder" checked class="dynamic-checkbox !w-[18px] h-[18px] min-w-[18px] flex-shrink-0 appearance-none bg-input-bg border-2 border-text-muted rounded cursor-pointer relative transition-all duration-200 p-0" />
+                                    <span class="text-base text-text-secondary">Show Border</span>
+                                </label>
+                            </div>
+
+                            <div class="mb-2">
                                 <h3 class="text-text-secondary text-base font-semibold mb-1">Accent Color</h3>
                                 <div class="flex flex-wrap items-center gap-2">
                                     <div id="colorButtons" class="flex flex-wrap gap-2"></div>
@@ -488,6 +495,7 @@
             const showSparklinesSection = document.getElementById("showSparklinesSection");
             const showDownloadBars = document.getElementById("showDownloadBars");
             const showDownloadBarsSection = document.getElementById("showDownloadBarsSection");
+            const showBorder = document.getElementById("showBorder");
             const platformModrinth = document.getElementById("platformModrinth");
             const platformCurseforge = document.getElementById("platformCurseforge");
             const platformHangar = document.getElementById("platformHangar");
@@ -858,6 +866,7 @@
                 relativeTime.checked = true;
                 showSparklines.checked = true;
                 showDownloadBars.checked = true;
+                showBorder.checked = true;
 
                 // Reset colors
                 selectedColor = defaultColor;
@@ -990,6 +999,7 @@
                     relativeTime: params.get("relativeTime") !== "false",
                     showSparklines: params.get("showSparklines") !== "false",
                     showDownloadBars: params.get("showDownloadBars") !== "false",
+                    showBorder: params.get("showBorder") !== "false",
                     color: params.get("color") || config.defaultColor,
                     backgroundColor: params.get("backgroundColor") || null,
                 };
@@ -1024,6 +1034,7 @@
                     if (!relativeTime.checked) params.set("relativeTime", "false");
                     if (!showSparklines.checked) params.set("showSparklines", "false");
                     if (!showDownloadBars.checked) params.set("showDownloadBars", "false");
+                    if (!showBorder.checked) params.set("showBorder", "false");
                     if (selectedColor !== config.defaultColor) params.set("color", selectedColor);
                     if (selectedBgColor !== null) params.set("backgroundColor", selectedBgColor);
                 } else {
@@ -1063,6 +1074,7 @@
                 relativeTime.checked = params.relativeTime;
                 showSparklines.checked = params.showSparklines;
                 showDownloadBars.checked = params.showDownloadBars;
+                showBorder.checked = params.showBorder;
                 selectedColor = params.color;
                 selectedBgColor = params.backgroundColor;
 
@@ -1471,6 +1483,9 @@
                         if (!showDownloadBars.checked) {
                             urlParams.set("showDownloadBars", "false");
                         }
+                        if (!showBorder.checked) {
+                            urlParams.set("showBorder", "false");
+                        }
                         if (selectedColor !== config.defaultColor) {
                             urlParams.set("color", selectedColor);
                         }
@@ -1507,6 +1522,9 @@
                         if (!showDownloadBars.checked) {
                             urlParams.set("showDownloadBars", "false");
                         }
+                        if (!showBorder.checked) {
+                            urlParams.set("showBorder", "false");
+                        }
                         if (selectedColor !== config.defaultColor) {
                             urlParams.set("color", selectedColor);
                         }
@@ -1537,6 +1555,9 @@
                         }
                         if (!showDownloadBars.checked) {
                             urlParams.set("showDownloadBars", "false");
+                        }
+                        if (!showBorder.checked) {
+                            urlParams.set("showBorder", "false");
                         }
                         if (selectedColor !== config.defaultColor) {
                             urlParams.set("color", selectedColor);
@@ -1741,6 +1762,10 @@
                 generate();
                 updateUrl();
             });
+            showBorder.addEventListener("change", () => {
+                generate();
+                updateUrl();
+            });
 
             function copyMarkdown() {
                 const text = markdownOutput.textContent.trim();
@@ -1787,7 +1812,7 @@
             function hasCustomizationFromUrl(params) {
                 const config = PLATFORMS[params.platform];
                 const relevantPlatform = params.platform === "modrinth" || params.platform === "curseforge" || params.platform === "hangar" || params.platform === "spigot";
-                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== CARD_LIMITS.DEFAULT_COUNT) || params.showVersions === false || params.maxVersions !== CARD_LIMITS.DEFAULT_COUNT || params.relativeTime === false || params.showSparklines === false || params.showDownloadBars === false || params.color !== config.defaultColor || params.backgroundColor !== null;
+                return (relevantPlatform && params.showProjects === false) || (relevantPlatform && params.maxProjects !== CARD_LIMITS.DEFAULT_COUNT) || params.showVersions === false || params.maxVersions !== CARD_LIMITS.DEFAULT_COUNT || params.relativeTime === false || params.showSparklines === false || params.showDownloadBars === false || params.showBorder === false || params.color !== config.defaultColor || params.backgroundColor !== null;
             }
 
             // Initialize input attributes from CARD_LIMITS

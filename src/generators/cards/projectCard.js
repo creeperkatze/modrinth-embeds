@@ -24,7 +24,8 @@ export function generateProjectCard(data, options, platformConfig, entityType = 
         color = null,
         backgroundColor = null,
         fromCache = false,
-        relativeTime = false
+        relativeTime = false,
+        showBorder = true
     } = options;
 
     // Use platform default color if no custom color specified
@@ -101,5 +102,5 @@ ${generateInfo(height, colors, fromCache)}
 ${generateAttribution(height, colors)}
 `;
 
-    return generateSvgWrapper(450, height, colors, content);
+    return generateSvgWrapper(450, height, colors, content, showBorder);
 }
