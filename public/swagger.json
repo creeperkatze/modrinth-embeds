@@ -373,10 +373,10 @@
         }
       }
     },
-    "/curseforge/project/{projectId}/rank": {
+    "/curseforge/project/{projectId}/versions": {
       "get": {
         "tags": ["CurseForge"],
-        "summary": "Get CurseForge project popularity rank badge",
+        "summary": "Get CurseForge project files count badge",
         "parameters": [
           { "$ref": "#/components/parameters/ProjectId" },
           { "$ref": "#/components/parameters/Color" },
@@ -389,10 +389,10 @@
         }
       }
     },
-    "/curseforge/project/{projectId}/versions": {
+    "/curseforge/project/{projectId}/rank": {
       "get": {
         "tags": ["CurseForge"],
-        "summary": "Get CurseForge project files count badge",
+        "summary": "Get CurseForge project rank badge",
         "parameters": [
           { "$ref": "#/components/parameters/ProjectId" },
           { "$ref": "#/components/parameters/Color" },

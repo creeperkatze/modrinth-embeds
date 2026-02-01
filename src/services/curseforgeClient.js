@@ -131,9 +131,9 @@ export class CurseforgeClient extends BasePlatformClient
             versions, // Use 'versions' key for consistency (instead of 'files')
             stats: {
                 downloads: mod?.downloadCount || 0,
-                rank: mod?.gamePopularityRank || null,
                 versionCount: totalFileCount, // Use 'versionCount' for consistency
-                fileCount: totalFileCount // Keep for backward compatibility
+                fileCount: totalFileCount, // Keep for backward compatibility
+                rank: mod?.gamePopularityRank || null
             },
             timings: {
                 api: apiTime,
@@ -162,9 +162,9 @@ export class CurseforgeClient extends BasePlatformClient
 
         const stats = {
             downloads: mod?.downloadCount || 0,
-            rank: mod?.gamePopularityRank || null,
             versionCount: 0,
-            fileCount: 0
+            fileCount: 0,
+            rank: mod?.gamePopularityRank || null
         };
 
         // Fetch files

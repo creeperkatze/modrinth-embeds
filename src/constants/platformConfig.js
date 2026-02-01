@@ -38,8 +38,8 @@ const STAT_CONFIGS = {
     curseforge: {
         project: [
             { label: "Downloads", field: "downloads" },
-            { label: "Rank", field: "rank" },
-            { label: "Files", field: "versionCount" }
+            { label: "Files", field: "versionCount" },
+            { label: "Rank", field: "rank" }
         ],
         user: [
             { label: "Downloads", field: "totalDownloads" },
