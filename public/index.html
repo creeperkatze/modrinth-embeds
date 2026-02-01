@@ -1365,8 +1365,8 @@
                 showVersionsSection.classList.toggle("hidden", !(isCard && isProject));
                 maxVersionsSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
                 relativeTimeSection.classList.toggle("hidden", !(isCard && isProject && showVersions.checked));
-                showSparklinesSection.classList.toggle("hidden", !isCard);
-                showDownloadBarsSection.classList.toggle("hidden", !isCard);
+                showSparklinesSection.classList.toggle("hidden", !(isCard && (isUserOrgOrCollection || isHangarUser || isSpigotAuthor)));
+                showDownloadBarsSection.classList.toggle("hidden", !(isCard && (isUserOrgOrCollection || isHangarUser || isSpigotAuthor)));
             }
 
             async function generate() {
