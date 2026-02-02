@@ -129,6 +129,7 @@ const handleCardRequest = async (req, res, next, cardType) => {
             showSparklines: req.query.showSparklines !== "false",
             showDownloadBars: req.query.showDownloadBars !== "false",
             showBorder: req.query.showBorder !== "false",
+            animations: !renderImage && req.query.animations !== "false",
             color: req.query.color ? `#${req.query.color.replace(/^#/, "")}` : null,
             backgroundColor: req.query.backgroundColor ? `#${req.query.backgroundColor.replace(/^#/, "")}` : null
         };

@@ -10,7 +10,8 @@ import {
     generateDivider,
     generateProjectList,
     generateInfo,
-    generateAttribution
+    generateAttribution,
+    calculateBottomDelay
 } from "../../utils/svgComponents.js";
 
 export function generateUserCard(data, options, platformConfig)
@@ -25,7 +26,8 @@ export function generateUserCard(data, options, platformConfig)
         backgroundColor = null,
         fromCache = false,
         relativeTime = false,
-        showBorder = true
+        showBorder = true,
+        animations = true
     } = options;
 
     // Use platform default color if no custom color specified
@@ -69,16 +71,18 @@ export function generateUserCard(data, options, platformConfig)
 
     const title = user.name || user.username || "Unknown User";
 
+    const bottomDelay = calculateBottomDelay(topProjects.length);
+
     const content = `
-${showSparklines ? generateActivitySparkline(allVersionDates, colors) : ""}
+${showSparklines ? generateActivitySparkline(allVersionDates, colors, animations) : ""}
 ${generateHeader("user", "user", title, colors, platformConfig.icon(colors.accentColor), platformConfig.iconViewBox)}
 ${generateProfileImage(user.avatar_url_base64 || user.avatarUrl || null, "profile-clip", 400, 60, 35, colors)}
 ${generateStatsGrid(statsData, colors)}
-${generateDivider(colors)}
-${generateProjectList(mappedProjects, platformConfig.labels.sections.topProjects, colors, showSparklines, showDownloadBars, relativeTime)}
-${generateInfo(height, colors, fromCache)}
-${generateAttribution(height, colors)}
+${generateDivider(colors, animations)}
+${generateProjectList(mappedProjects, platformConfig.labels.sections.topProjects, colors, showSparklines, showDownloadBars, animations)}
+${generateInfo(height, colors, fromCache, animations, bottomDelay)}
+${generateAttribution(height, colors, animations, bottomDelay)}
 `;
 
-    return generateSvgWrapper(450, height, colors, content, showBorder);
+    return generateSvgWrapper(450, height, colors, content, showBorder, animations);
 }

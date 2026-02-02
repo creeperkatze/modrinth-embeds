@@ -11,7 +11,8 @@ import {
     generateDivider,
     generateVersionList,
     generateInfo,
-    generateAttribution
+    generateAttribution,
+    calculateBottomDelay
 } from "../../utils/svgComponents.js";
 
 export function generateProjectCard(data, options, platformConfig, entityType = "project")
@@ -25,7 +26,8 @@ export function generateProjectCard(data, options, platformConfig, entityType = 
         backgroundColor = null,
         fromCache = false,
         relativeTime = false,
-        showBorder = true
+        showBorder = true,
+        animations = true
     } = options;
 
     // Use platform default color if no custom color specified
@@ -89,8 +91,10 @@ export function generateProjectCard(data, options, platformConfig, entityType = 
     // Get title field name per platform
     const title = project.title || project.name || "Unknown";
 
+    const bottomDelay = calculateBottomDelay(latestVersions.length);
+
     const content = `
-${showSparklines ? generateActivitySparkline(versionDates, colors) : ""}
+${showSparklines ? generateActivitySparkline(versionDates, colors, animations) : ""}
 ${generateHeader(entityType, projectTypeIconName, title, colors, platformConfig.icon(colors.accentColor), platformConfig.iconViewBox)}
 ${generateRectImage(
         project.icon_url_base64 || null,
@@ -103,11 +107,11 @@ ${generateRectImage(
         colors
     )}
 ${generateStatsGrid(statsData, colors)}
-${generateDivider(colors)}
-${generateVersionList(latestVersions, colors, relativeTime, platformConfig.labels.sections.latestVersions)}
-${generateInfo(height, colors, fromCache)}
-${generateAttribution(height, colors)}
+${generateDivider(colors, animations)}
+${generateVersionList(latestVersions, colors, relativeTime, platformConfig.labels.sections.latestVersions, animations)}
+${generateInfo(height, colors, fromCache, animations, bottomDelay)}
+${generateAttribution(height, colors, animations, bottomDelay)}
 `;
 
-    return generateSvgWrapper(450, height, colors, content, showBorder);
+    return generateSvgWrapper(450, height, colors, content, showBorder, animations);
 }

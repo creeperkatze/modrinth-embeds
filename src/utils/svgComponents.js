@@ -6,6 +6,19 @@ import { getLoaderColor, getProjectTypeIcon } from "../constants/loaderConfig.js
 import packageJson from "../../package.json" with { type: "json" };
 const VERSION = packageJson.version;
 
+export const ANIMATION_DELAYS = {
+    SECTION_HEADER_DELAY: 0.1,
+    SECTION_HEADER_TO_FIRST_ITEM_DELAY: 0.1,
+    ITEM_DELAY: 0.08,
+    BOTTOM_INFO_DELAY: 0.1,
+};
+
+export function calculateBottomDelay(itemCount)
+{
+    const firstItemDelay = ANIMATION_DELAYS.SECTION_HEADER_DELAY + ANIMATION_DELAYS.SECTION_HEADER_TO_FIRST_ITEM_DELAY;
+    return firstItemDelay + (itemCount * ANIMATION_DELAYS.ITEM_DELAY) + ANIMATION_DELAYS.BOTTOM_INFO_DELAY;
+}
+
 export function getThemeColors(customColor = null, backgroundColor = null)
 {
     const defaultAccentColor = "#1bd96a";
@@ -26,7 +39,7 @@ export function getThemeColors(customColor = null, backgroundColor = null)
     };
 }
 
-export function generateSvgWrapper(width, height, colors, content, showBorder = true)
+export function generateSvgWrapper(width, height, colors, content, showBorder = true, animations = true)
 {
     const borderRect = showBorder
         ? `    <rect stroke="${colors.borderColor}" fill="${colors.bgColor}" rx="4.5" x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" vector-effect="non-scaling-stroke"/>
@@ -34,8 +47,55 @@ export function generateSvgWrapper(width, height, colors, content, showBorder = 
         : `    <rect fill="${colors.bgColor}" rx="4.5" width="${width}" height="${height}"/>
 `;
 
+    const styleBlock = animations ? `
+  <style>
+    @keyframes fadeInAnimation {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideInAnimation {
+      from { transform: translateX(-10px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes growWidthAnimation {
+      from { width: 0; }
+      to { width: var(--target-width); }
+    }
+    @keyframes sparklineDrawAnimation {
+      from { stroke-dashoffset: 1000; }
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes scaleInX {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    .sparkline-path {
+      stroke-dasharray: 1000;
+      animation: sparklineDrawAnimation 1s ease-out forwards;
+    }
+    .section-header {
+      opacity: 0;
+      animation: slideInAnimation 0.5s ease-out forwards;
+    }
+    .fade-in-delayed {
+      opacity: 0;
+      animation: fadeInAnimation 0.5s ease-out forwards;
+    }
+    .list-item {
+      opacity: 0;
+      animation: slideInAnimation 0.4s ease-out forwards;
+    }
+    .divider {
+      animation: fadeInAnimation 0.8s ease-out forwards;
+    }
+    .download-bar {
+      animation: growWidthAnimation 0.6s ease-out forwards;
+    }
+  </style>` : "";
+
     return `
 <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+${styleBlock}
   <defs>
     <clipPath id="outer_rectangle_summary">
       <rect width="${width}" height="${height}" rx="4.5"/>
@@ -47,10 +107,13 @@ ${borderRect}${content}
 </svg>`.trim();
 }
 
-export function generateActivitySparkline(versionDates, colors)
+export function generateActivitySparkline(versionDates, colors, animations = true)
 {
     const { path: sparklinePath, fillPath: sparklineFillPath } = generateSparkline(versionDates);
-    return `
+    const sparklineWidth = 420;
+
+    if (!animations) {
+        return `
   <!-- Activity Sparkline (background) -->
   <g transform="translate(15, 0)">
     <path
@@ -60,12 +123,37 @@ export function generateActivitySparkline(versionDates, colors)
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      opacity="0.3"
+      opacity="0.4"
     />
     <path
       d="${sparklineFillPath}"
       fill="${colors.accentColor}"
-      opacity="0.05"
+      opacity="0.1"
+    />
+  </g>`;
+    }
+
+    return `
+  <!-- Activity Sparkline (background) -->
+  <defs>
+    <clipPath id="main-sparkline-clip">
+      <rect x="0" y="-500" width="${sparklineWidth}" height="1000" style="transform-origin: left center; animation: scaleInX 1s ease-out forwards"/>
+    </clipPath>
+  </defs>
+  <g transform="translate(15, 0)" clip-path="url(#main-sparkline-clip)">
+    <path
+      d="${sparklinePath}"
+      fill="none"
+      stroke="${colors.accentColor}"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="0.4"
+    />
+    <path
+      d="${sparklineFillPath}"
+      fill="${colors.accentColor}"
+      opacity="0.1"
     />
   </g>`;
 }
@@ -131,7 +219,7 @@ export function generateStatsGrid(stats, colors)
   </g>`).join("");
 }
 
-export function generateProjectListItem(project, index, totalDownloads, colors, showSparklines = true, showDownloadBars = true)
+export function generateProjectListItem(project, index, totalDownloads, colors, showSparklines = true, showDownloadBars = true, animations = true, baseDelay = 0)
 {
     const yPos = 160 + (index * 50);
     const projectName = escapeXml(truncateText(project.title, 18));
@@ -162,10 +250,11 @@ export function generateProjectListItem(project, index, totalDownloads, colors, 
     }).join("");
 
     const projectIconUrl = project.icon_url_base64 || "";
+    const animationDelay = baseDelay + (index * ANIMATION_DELAYS.ITEM_DELAY);
 
     return `
   <!-- Project ${index + 1} -->
-  <g>
+  <g${animations ? ' class="list-item"' : ""}${animations ? ` style="animation-delay: ${animationDelay}s"` : ""}>
     <defs>
       <clipPath id="project-clip-${index}">
         <rect x="15" y="${yPos - 18}" width="420" height="40" rx="6"/>
@@ -177,27 +266,30 @@ export function generateProjectListItem(project, index, totalDownloads, colors, 
     <rect x="15" y="${yPos - 18}" width="420" height="40" fill="none" stroke="${colors.borderColor}" stroke-width="1" rx="6" vector-effect="non-scaling-stroke"/>
 
 ${showSparklines ? `    <!-- Project version activity sparkline (centered) -->
-    <g clip-path="url(#project-clip-${index})">
-      <g transform="translate(${sparklineXOffset}, ${yPos - 88})">
-        <path
-          d="${projectSparklinePath}"
-          fill="none"
-          stroke="${colors.accentColor}"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          opacity="0.3"
-        />
-        <path
-          d="${projectSparklineFillPath}"
-          fill="${colors.accentColor}"
-          opacity="0.05"
-        />
-      </g>
+    <defs>
+      <clipPath id="sparkline-clip-${index}">
+        <rect x="0" y="-500" width="${sparklineWidth}" height="1000"${animations ? ` style="transform-origin: left center; animation: scaleInX 1s ease-out ${animationDelay}s forwards"` : ""}/>
+      </clipPath>
+    </defs>
+    <g transform="translate(${sparklineXOffset}, ${yPos - 88})" clip-path="url(#sparkline-clip-${index})">
+      <path
+        d="${projectSparklinePath}"
+        fill="none"
+        stroke="${colors.accentColor}"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.4"
+      />
+      <path
+        d="${projectSparklineFillPath}"
+        fill="${colors.accentColor}"
+        opacity="0.1"
+      />
     </g>` : ""}
 
 ${showDownloadBars ? `    <!-- Relative downloads bar -->
-    <rect x="15.5" y="${yPos - 18.5}" width="${barWidth - 0.5}" height="3" fill="${colors.accentColor}" clip-path="url(#project-clip-${index})"/>` : ""}
+    <rect x="15.5" y="${yPos - 18.5}" width="${barWidth - 0.5}" height="3" fill="${colors.accentColor}" clip-path="url(#project-clip-${index})"${animations ? ' class="download-bar"' : ""}${animations ? ` style="--target-width: ${barWidth}px; animation-delay: ${animationDelay + 0.1}s"` : ""}/>` : ""}
 
     <!-- Project image -->
     ${projectIconUrl ? `<image x="20" y="${yPos - 12}" width="28" height="28" href="${projectIconUrl}" clip-path="url(#project-icon-clip-${index})"/>` : `<rect x="20" y="${yPos - 12}" width="28" height="28" fill="${colors.borderColor}" rx="4"/>`}
@@ -232,32 +324,35 @@ ${showDownloadBars ? `    <!-- Relative downloads bar -->
   </g>`;
 }
 
-export function generateDivider(colors)
+export function generateDivider(colors, animations = true)
 {
     return `
   <!-- Divider -->
-  <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+  <line x1="15" y1="110" x2="435" y2="110" stroke="${colors.borderColor}" stroke-width="1" vector-effect="non-scaling-stroke"${animations ? ' class="divider"' : ""}/>`;
 }
 
-export function generateProjectList(topProjects, sectionTitle, colors, showSparklines = true, showDownloadBars = true)
+export function generateProjectList(topProjects, sectionTitle, colors, showSparklines = true, showDownloadBars = true, animations = true)
 {
     if (!topProjects || topProjects.length === 0) return "";
 
     const totalDownloads = topProjects.reduce((sum, p) => sum + p.downloads, 0);
+    const sectionDelay = ANIMATION_DELAYS.SECTION_HEADER_DELAY;
+    const firstProjectDelay = sectionDelay + ANIMATION_DELAYS.SECTION_HEADER_TO_FIRST_ITEM_DELAY;
+
     const projectsHtml = topProjects.map((project, index) =>
-        generateProjectListItem(project, index, totalDownloads, colors, showSparklines, showDownloadBars)
+        generateProjectListItem(project, index, totalDownloads, colors, showSparklines, showDownloadBars, animations, firstProjectDelay)
     ).join("");
 
     return `
   <!-- Projects Header -->
-  <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
+  <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}"${animations ? ` class="section-header" style="animation-delay: ${sectionDelay}s"` : ""}>
     ${sectionTitle}
   </text>
 
   ${projectsHtml}`;
 }
 
-export function generateVersionListItem(version, index, colors, relativeTime)
+export function generateVersionListItem(version, index, colors, relativeTime, animations = true)
 {
     const yPos = 160 + (index * 50);
     const versionNumber = escapeXml(truncateText(version.version_number, 18));
@@ -289,10 +384,11 @@ export function generateVersionListItem(version, index, colors, relativeTime)
     const gameVersionsText = gameVersions.slice(0, 3).join(", ") + (gameVersions.length > 3 ? "..." : "");
     const gameVersionsX = 20 + (loaders.length * 18) + 2;
     const versionDownloads = formatNumber(version.downloads || 0);
+    const animationDelay = 0.3 + (index * 0.08);
 
     return `
   <!-- Version ${index + 1} -->
-  <g>
+  <g${animations ? ' class="list-item"' : ""}${animations ? ` style="animation-delay: ${animationDelay}s"` : ""}>
     <defs>
       <clipPath id="version-clip-${index}">
         <rect x="15" y="${yPos - 18}" width="420" height="40" rx="6"/>
@@ -330,33 +426,33 @@ export function generateVersionListItem(version, index, colors, relativeTime)
   </g>`;
 }
 
-export function generateVersionList(versions, colors, relativeTime, headerText = "Latest Versions")
+export function generateVersionList(versions, colors, relativeTime, headerText = "Latest Versions", animations = true)
 {
     if (!versions || versions.length === 0) return "";
 
     const versionsHtml = versions.map((version, index) =>
-        generateVersionListItem(version, index, colors, relativeTime)
+        generateVersionListItem(version, index, colors, relativeTime, animations)
     ).join("");
 
     return `
   <!-- Versions Header -->
-  <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}">
+  <text x="15" y="130" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="${colors.textColor}"${animations ? ' class="section-header" style="animation-delay: 0.2s"' : ""}>
     ${escapeXml(headerText)}
   </text>
 
   ${versionsHtml}`;
 }
 
-export function generateAttribution(height, colors)
+export function generateAttribution(height, colors, animations, animationDelay)
 {
     return `
   <!-- Bottom right attribution -->
-  <text x="435" y="${height - 5}" font-family="Inter, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end" opacity="0.6">
+  <text x="435" y="${height - 5}" font-family="Inter, sans-serif" font-size="10" fill="${colors.textColor}" text-anchor="end"${animations ? ` class="fade-in-delayed" style="animation-delay: ${animationDelay}s"` : ""}>
     modfolio.creeperkatze.de
   </text>`;
 }
 
-export function generateInfo(height, colors, fromCache = false)
+export function generateInfo(height, colors, fromCache = false, animations, animationDelay)
 {
     const now = new Date();
     const dateTimeStr = now.toLocaleString("en-US", {
@@ -370,7 +466,7 @@ export function generateInfo(height, colors, fromCache = false)
     const versionText = `v${VERSION} • ${dateTimeStr}`;
     const cacheHtml = fromCache ? `
   <!-- Cache icon -->
-  <g opacity="0.6">
+  <g opacity="0.6"${animations ? ` class="fade-in-delayed" style="animation-delay: ${animationDelay}s"` : ""}>
     <svg x="15" y="${height - 15}" width="12" height="12" viewBox="0 0 24 24">
       ${ICONS["database-zap"](colors.textColor)}
     </svg>
@@ -382,9 +478,8 @@ export function generateInfo(height, colors, fromCache = false)
         font-family="Inter, sans-serif"
         font-size="10"
         fill="${colors.textColor}"
-        text-anchor="start"
-        opacity="0.6">
+        text-anchor="start"${animations ? ` class="fade-in-delayed" style="animation-delay: ${animationDelay}s"` : ""}>
     ${versionText}
-  </text>   
+  </text>
 ${cacheHtml}`;
 }
