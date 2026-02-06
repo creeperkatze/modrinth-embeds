@@ -7,7 +7,7 @@ Generate fast, beautiful and consistent embeddable cards and badges for Modrinth
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/creeperkatze/modfolio?labelColor=0d143c)
 ![GitHub Repo stars](https://img.shields.io/github/stars/creeperkatze/modfolio?style=flat&labelColor=0d143c)
 
-## Quick Start
+## 🚀 Quick Start
 
 Use the **[Website](https://modfolio.creeperkatze.de)** to visually configure and preview your embeds.
 The api docs can be found at **[here](https://modfolio.creeperkatze.de/docs)**.
@@ -19,7 +19,7 @@ Examples:
 [![SimpleVoiceChat](https://modfolio.creeperkatze.de/hangar/project/SimpleVoiceChat)](https://hangar.papermc.io/henkelmax/SimpleVoiceChat)
 [![LuckPerms](https://modfolio.creeperkatze.de/spigot/resource/28140)](https://spigotmc.org/resources/28140/)
 
-## Endpoints
+## 🔗 Endpoints
 
 Base URL: `https://modfolio.creeperkatze.de`
 
@@ -136,7 +136,7 @@ Compact badges showing a single metric.
 | Hangar | `#3371ED` |
 | Spigot | `#E8A838`|
 
-## Development
+## 👨‍💻 Development
 
 ### Prequisites
 
@@ -161,12 +161,12 @@ pnpm dev
 
 Copy the `.env.example` file and rename it to `.env`.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are always welcome!
 
 Please ensure you run `pnpm lint` before opening a pull request.
 
-## License
+## 📜 License
 
 AGPL-3.0
