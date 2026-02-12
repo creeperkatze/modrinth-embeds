@@ -203,8 +203,13 @@ export function generateHeader(entityType, iconName, title, colors, platformIcon
   </text>`;
 }
 
-export function generateProfileImage(imageUrl, clipId, centerX, centerY, radius, colors, animations = true)
+export function generateProfileImage(imageUrl, clipId, centerX, centerY, radius, _colors, animations = true)
 {
+    // Dont render anything if theres no image
+    if (!imageUrl) {
+        return "";
+    }
+
     return `
   <defs>
     <clipPath id="${clipId}">
@@ -212,12 +217,17 @@ export function generateProfileImage(imageUrl, clipId, centerX, centerY, radius,
     </clipPath>
   </defs>
   <g${animations ? ' class="profile-image"' : ""}>
-    ${imageUrl ? `<image x="${centerX - radius}" y="${centerY - radius}" width="${radius * 2}" height="${radius * 2}" href="${imageUrl}" clip-path="url(#${clipId})"/>` : `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="${colors.borderColor}"/>`}
+    <image x="${centerX - radius}" y="${centerY - radius}" width="${radius * 2}" height="${radius * 2}" href="${imageUrl}" clip-path="url(#${clipId})"/>
   </g>`;
 }
 
-export function generateRectImage(imageUrl, clipId, x, y, width, height, borderRadius, colors, animations = true)
+export function generateRectImage(imageUrl, clipId, x, y, width, height, borderRadius, _colors, animations = true)
 {
+    // Dont render anything if theres no image
+    if (!imageUrl) {
+        return "";
+    }
+
     return `
   <defs>
     <clipPath id="${clipId}">
@@ -225,7 +235,7 @@ export function generateRectImage(imageUrl, clipId, x, y, width, height, borderR
     </clipPath>
   </defs>
   <g${animations ? ' class="profile-image"' : ""}>
-    ${imageUrl ? `<image x="${x}" y="${y}" width="${width}" height="${height}" href="${imageUrl}" clip-path="url(#${clipId})"/>` : `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${borderRadius}" fill="${colors.borderColor}"/>`}
+    <image x="${x}" y="${y}" width="${width}" height="${height}" href="${imageUrl}" clip-path="url(#${clipId})"/>
   </g>`;
 }
 
@@ -323,7 +333,9 @@ ${showDownloadBars ? `    <!-- Relative downloads bar -->
     <rect x="15.5" y="${yPos - 18.5}" width="${barWidth - 0.5}" height="3" fill="${colors.accentColor}" clip-path="url(#project-clip-${index})"${animations ? ' class="download-bar"' : ""}${animations ? ` style="--target-width: ${barWidth}px; animation-delay: ${animationDelay + 0.1}s"` : ""}/>` : ""}
 
     <!-- Project image -->
-    ${projectIconUrl ? `<image x="20" y="${yPos - 12}" width="28" height="28" href="${projectIconUrl}" clip-path="url(#project-icon-clip-${index})"/>` : `<rect x="20" y="${yPos - 12}" width="28" height="28" fill="${colors.borderColor}" rx="4"/>`}
+    ${projectIconUrl ? `<image x="20" y="${yPos - 12}" width="28" height="28" href="${projectIconUrl}" clip-path="url(#project-icon-clip-${index})"/>` : `<svg x="20" y="${yPos - 12}" width="28" height="28" viewBox="0 0 24 24">
+      ${ICONS.box(colors.borderColor)}
+    </svg><rect x="20" y="${yPos - 12}" width="28" height="28" fill="none" stroke="${colors.borderColor}" stroke-width="1" rx="4"/>`}
 
     <text x="54" y="${yPos - 2}" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="${colors.textColor}">
       ${projectName}
