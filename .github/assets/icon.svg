@@ -2,13 +2,16 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="600mm"
+   width="110mm"
    height="100mm"
-   viewBox="0 0 600 100"
+   viewBox="0 0 110 100"
    version="1.1"
    id="svg1"
-   sodipodi:docname="logo.svg"
+   sodipodi:docname="icon.svg"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   inkscape:export-filename="logo.png"
+   inkscape:export-xdpi="45.720001"
+   inkscape:export-ydpi="45.720001"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,15 +26,15 @@
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="0.0587375"
-     inkscape:cx="-1549.2658"
-     inkscape:cy="3702.9155"
+     inkscape:zoom="0.9398"
+     inkscape:cx="271.33433"
+     inkscape:cy="272.93041"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1" />
+     inkscape:current-layer="g3" />
   <defs
      id="defs1" />
   <g
@@ -76,16 +79,5 @@
          y="289.04303"
          ry="10" />
     </g>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:109.361px;font-family:Inter;-inkscape-font-specification:Inter;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#15151e;stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       x="310.8486"
-       y="339.67542"
-       id="text1-5"
-       inkscape:label="Text"><tspan
-         id="tspan1-1"
-         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:109.361px;font-family:Inter;-inkscape-font-specification:'Inter Heavy';fill:#ffffff;fill-opacity:1;stroke:#15151e;stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-         x="310.8486"
-         y="339.67542">Modfolio</tspan></text>
   </g>
 </svg>
