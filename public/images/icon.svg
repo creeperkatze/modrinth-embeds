@@ -7,45 +7,18 @@
    viewBox="0 0 110 100"
    version="1.1"
    id="svg1"
-   sodipodi:docname="iconclean.svg"
-   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
-   inkscape:export-filename="logo.png"
-   inkscape:export-xdpi="45.720001"
-   inkscape:export-ydpi="45.720001"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview1"
-     pagecolor="#505050"
-     bordercolor="#ffffff"
-     borderopacity="1"
-     inkscape:showpageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="1"
-     inkscape:deskcolor="#505050"
-     inkscape:document-units="mm"
-     inkscape:zoom="0.9398"
-     inkscape:cx="115.98212"
-     inkscape:cy="272.93041"
-     inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="g3" />
   <defs
      id="defs1" />
   <g
      id="g3"
-     inkscape:label="Logo"
      style="fill:#ffffff;fill-opacity:1;stroke:#15151e;stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
      transform="translate(-195.12051,-249.04304)">
     <g
        id="g2"
-       inkscape:label="Icon"
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers">
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       transform="matrix(1.2138597,0,0,1.2138597,-53.114434,-63.81136)">
       <rect
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
          id="rect1-88"
